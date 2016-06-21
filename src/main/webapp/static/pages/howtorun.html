@@ -1,0 +1,66 @@
+<html>
+
+<head>
+    <title>MSBAdapterRegression Automated Tests - How To Run</title>
+    <script type="text/JavaScript" src="content.js"></script>
+</head>
+
+<body>
+<div id="container">
+    <h2>To run automated tests properly, be sure the next steps are done:</h2>
+
+    <div style="margin-left: 20px;">
+        <h2>1. Automated tests code</h2>
+
+        <div style="margin-left: 50px; margin-bottom: 50px">
+            1.1 If you made any changes in tests code do the next steps , else skip entire step 1
+            <ul>
+                <li>Commit your code on SVN</li>
+                <li>Go on <a
+                        href="http://lxsrvmgi0205.mgi.de:8080/jenkins/view/MSBAdapter/job/AutomatedRegressionTests/">Jenkins
+                    Project</a> and run a build or release (or wait 1 hour from the last commit, and auto build will
+                    start :) )
+                    <ul>
+                        <li>If you created a release you have to Promote it as "Approved" and create one more build
+                            after that
+                        </li>
+                    </ul>
+                </li>
+                <li>Click on the REINDEX button <input id='reindex_bt' type='image'
+                                                       style='margin-left: 5px; height: 35px' src='images/reload.png'>
+                    (You must selected no environment)
+                </li>
+            </ul>
+        </div>
+
+        <h2>2. MSBAdapter release version</h2>
+
+        <div style="margin-left: 50px; margin-bottom: 50px">
+            2.1 If the desired MSBAdapter version is already installed on the environment, skip entire step 2<br/>
+            2.2 Be sure that the MSBAdapter release on <a
+                href="http://lxsrvmgi0205.mgi.de:8080/jenkins/view/MSBAdapter/job/MSBAdapter/">Jenkins Project</a> that
+            you want to test has:
+            <ul>
+                <li>Promotion status "QA Ready" - if not promote it</li>
+                <li>One more build is created after promoted release - if you just promote a release, create a new
+                    build
+                </li>
+            </ul>
+        </div>
+
+        <h2>3. Run automated tests</h2>
+
+        <div style="margin-left: 50px; margin-bottom: 50px">
+            3.1 Select one environment - only tests for that environment will be available<br/>
+            3.2 Select the desired tests<br/>
+            3.3 Click Run :)<br/>
+            <br/>
+            NOTE: We recommend to run first the Installation tests (ALONE) and wait if the correct MSBAdapter version
+            was successfully installed. After, un-check installation test and run the others tests (It is possible that
+            installation test fail. This means all the others tests are useless ).
+            If you installed manually the the MSBAdapter version on the environment skip "installation test"
+        </div>
+    </div>
+</div>
+</body>
+</html>
