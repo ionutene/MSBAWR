@@ -7,6 +7,7 @@
 <c:url value="/static/css/style.css" var="staticCSS"/>
 <c:url value="/static/js/jquery-3.0.0.min.js" var="staticJQuery"/>
 <c:url value="/static/js/logic.js" var="staticJS"/>
+<c:url value="/static/json/environments.json" var="staticEnvs" />
 
 <html>
 <head>
@@ -21,9 +22,22 @@
 </div>
 
 <div id="nav">
-    London<br>
+    <p id="envJSONPath" hidden>"${staticEnvs}"</p>
+    <p>Select Environment: <select id="select_envs">
+        <script type="text/javascript">getEnv("${staticEnvs}");</script>
+    </select></p>
+    <br>
+    <p>Select Test Type:
+    <select id="select_type">
+        <option value="NO_TESTS"></option>
+        <option value="install">Install</option>
+        <option value="integration">Integration</option>
+        <option value="event">Event</option>
+    </select></p>
+    <br>
     <a href="${staticHowTo}" id="aLink">How to run tests</a><br>
     <a href="${staticResults}" id="aLink2">Results</a>
+    <div id="checkers" hidden></div>
 </div>
 
 <div id="section">
