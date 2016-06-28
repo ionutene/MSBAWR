@@ -15,7 +15,6 @@ import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -29,23 +28,25 @@ public class OptionsController {
     @RequestMapping(value = "/getOptions")
     public AjaxResponseBody getSearchResultViaAjax(@RequestBody SearchCriteria search) {
         AjaxResponseBody ajaxResponseBody = new AjaxResponseBody();
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> data = new HashMap<>();
+        Map<String, String> data;
         try {
             LOGGER.info(search);
 
-            byte[] environmentsData = Files.readAllBytes(Paths.get(servletContext.getRealPath("/static/json/envCorrelation.json")));
-            byte[] testTypesData = Files.readAllBytes(Paths.get(servletContext.getRealPath("/static/json/testTypes.json")));
-
             // convert JSON string to Map
-            data = mapper.readValue(environmentsData, new TypeReference<Map<String, String>>(){});
+            data = getJSONDataFromStatic("/static/json/envCorrelation.json");
             LOGGER.info(data);
-            data = mapper.readValue(testTypesData, new TypeReference<Map<String, String>>(){});
+            data = getJSONDataFromStatic("/static/json/testTypes.json");
             LOGGER.info(data);
 
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
         }
         return null;
+    }
+
+    private Map<String, String> getJSONDataFromStatic(String staticPathToJSON) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(Files.readAllBytes(Paths.get(servletContext.getRealPath(staticPathToJSON))),
+                new TypeReference<Map<String, String>>(){});
     }
 }

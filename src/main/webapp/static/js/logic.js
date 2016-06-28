@@ -21,19 +21,8 @@ $(document).ready(function () {
     });
 
     $("#select_type").change(function () {
-/*        if ($(this).val() == "NO_TESTS") {
-            $("#checkers").hide();
-            $("#checkers").empty();
-            $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
-            $("#checkers").show();
-        } else {
-            $("#checkers").hide();
-            $("#checkers").empty();
-            $("<p>").text("You have chosen: " + $(this).val() + " tests!").appendTo("#checkers");
-            $("#checkers").show();
-        }*/
-
         switch ($(this).val()) {
+//          You want to define what happens when DefaultValue/Empty value is selected
             case "NONE":
                 $('#select_filter').empty();
                 $("<option>").attr("value", "").text("Not Available!").appendTo("#select_filter");
@@ -43,11 +32,7 @@ $(document).ready(function () {
                 $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
                 $("#checkers").show();
                 break;
-            case "install":
-                $('#select_filter').empty();
-                $("<option>").attr("value", "").text("Not Available!").appendTo("#select_filter");
-                $('#select_filter').prop("disabled", true );
-                break;
+//          For all other cases you want to deffer the logic to the server
             default :
                 $('#select_filter').empty();
                 $("<option>").attr("value", "Available").text("Available").appendTo("#select_filter");
