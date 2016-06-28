@@ -75,7 +75,7 @@ function appendOptionsFromJSON(JSONPath, idName) {
 
 function searchWithAjax(){
     var options = {};
-    options["env"] = $("#select_envs").val();
+    options["env"] = $('#select_envs').find('option:selected').html();
     options["type"] = $("#select_type").val();
     console.log(options);
 
