@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <!-- immediateFlush="false" -->
+<!--        <File name="MyFile" fileName="LOGGER.log" append="false">
+            &lt;!&ndash;<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>&ndash;&gt;
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+        </File>
+        <File name="MyDebugFile" fileName="DEBUG_LOGGER.log" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>-->
+    </Appenders>
+    <Loggers>
+        <!--Ignore any messages from the internal logger of HttpClient-->
+        <!--<logger name="org.apache.http" level="error" />-->
+        <Root level="debug">
+            <AppenderRef ref="Console"/>
+            <!--<AppenderRef ref="MyFile"/>-->
+            <!--<AppenderRef ref="MyDebugFile"/>-->
+        </Root>
+    </Loggers>
+</Configuration>
