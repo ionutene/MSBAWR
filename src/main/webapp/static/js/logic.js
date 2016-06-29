@@ -18,6 +18,13 @@ $(document).ready(function () {
 //  RESET if someone changes the Environment
     $("#select_envs").change(function () {
         $("#select_type").prop('selectedIndex',0);
+        $('#select_filter').empty();
+        $("<option>").attr("value", "Not Available!").text("Not Available!").appendTo("#select_filter");
+        $('#select_filter').prop("disabled", true );
+        $("#checkers").hide();
+        $("#checkers").empty();
+        $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
+        $("#checkers").show();
     });
 
     $("#select_type").change(function () {
@@ -25,7 +32,7 @@ $(document).ready(function () {
 //          You want to define what happens when DefaultValue/Empty value is selected
             case "NONE":
                 $('#select_filter').empty();
-                $("<option>").attr("value", "").text("Not Available!").appendTo("#select_filter");
+                $("<option>").attr("value", "Not Available!").text("Not Available!").appendTo("#select_filter");
                 $('#select_filter').prop("disabled", true );
                 $("#checkers").hide();
                 $("#checkers").empty();
@@ -35,9 +42,26 @@ $(document).ready(function () {
 //          For all other cases you want to deffer the logic to the server
             default :
                 $('#select_filter').empty();
-                $("<option>").attr("value", "Available").text("Available").appendTo("#select_filter");
-                searchWithAjax();
-                $('#select_filter').prop("disabled", false );
+                getFilterOptions();
+                break;
+        }
+    });
+
+    $("#select_filter").change(function () {
+        switch ($(this).val()) {
+//          You want to define what happens when DefaultValue/Empty value is selected
+            case "NONE":
+                $("#checkers").hide();
+                $("#checkers").empty();
+                $("<p>").text("Here is where the checkboxes will be, please select a filter!").appendTo("#checkers");
+                $("#checkers").show();
+                break;
+//          For all other cases you want to deffer the logic to the server
+            default :
+                $("#checkers").hide();
+                $("#checkers").empty();
+                $("<p>").text("So many shiny checkboxes!").appendTo("#checkers");
+                $("#checkers").show();
                 break;
         }
     });
@@ -45,20 +69,29 @@ $(document).ready(function () {
 });
 
 //  When handicapable remove this function and do it exclusively with JQuery
-function appendOptionsFromJSON(JSONPath, idName) {
+function appendOptionsFromJSONPath(JSONPath, idName) {
     $.getJSON(JSONPath)
         .done(function (json) {
+            console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
             $.each(json, function (key, value) {
                 $("<option>").attr("value", value).text(key).appendTo(idName);
             })
-        })
-        .fail(function (jqxhr, textStatus, error) {
+        });
+/*        .fail(function (jqxhr, textStatus, error) {
             var err = textStatus + ", " + error;
             console.log("Request Failed: " + err);
-        });
+        });*/
 }
 
-function searchWithAjax(){
+function appendOptionsFromJSON(json, idName) {
+    console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
+    $.each(json, function (key, value) {
+        $("<option>").attr("value", value).text(key).appendTo(idName);
+    })
+//    $(idName).prop('selectedIndex',0);
+}
+
+function getFilterOptions(){
     var options = {};
     options["env"] = $('#select_envs').find('option:selected').html();
     options["type"] = $("#select_type").val();
@@ -74,10 +107,19 @@ function searchWithAjax(){
         success : function(data) {
             console.log("SUCCESS: ", data);
             appendOptionsFromJSON(data, "#select_filter");
+
+            if($('#select_filter').find('option:first').html() == "Not Available!") {
+                $('#select_filter').prop("disabled", true );
+            } else {
+                $('#select_filter').prop("disabled", false );
+            }
+            $("#checkers").hide();
+            $("#checkers").empty();
+            $("<p>").text("Here is where the checkboxes will be, please select a filter!").appendTo("#checkers");
+            $("#checkers").show();
         },
         error : function(e) {
             console.log("ERROR: ", e);
-            appendOptionsFromJSON(e, "#select_filter");
         },
         done : function(e) {
             console.log("DONE");

@@ -16,6 +16,8 @@
     <link rel="stylesheet" type="text/css" href="${staticCSS}">
     <script type="text/javascript" src="${staticJQuery}"></script>
     <script type="text/javascript" src="${staticJS}"></script>
+    <script type="text/javascript">appendOptionsFromJSONPath("${staticEnvironments}", "#select_envs");</script>
+    <script type="text/javascript">appendOptionsFromJSONPath("${staticTestTypes}", "#select_type");</script>
 </head>
 <body>
 <div id="header">
@@ -24,14 +26,10 @@
 
 <div id="nav">
     <p>Select Environment:
-        <select id="select_envs">
-            <script type="text/javascript">appendOptionsFromJSON("${staticEnvironments}", "#select_envs");</script>
-        </select>
+        <select id="select_envs"></select>
     </p>
     <p>Select Test Type:
-        <select id="select_type">
-            <script type="text/javascript">appendOptionsFromJSON("${staticTestTypes}", "#select_type");</script>
-        </select>
+        <select id="select_type"></select>
     </p>
     <p>Select Filter:
         <select id="select_filter"></select>
