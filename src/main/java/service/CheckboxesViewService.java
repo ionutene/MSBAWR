@@ -102,34 +102,26 @@ public class CheckboxesViewService {
 
     public String getHTMLDump() {
         StringBuilder stringBuilder = new StringBuilder();
-        Set<String> packageFilter;
 
-        while (hasSubpackages(finalTests)) {
-            packageFilter = getRootPackageNames(finalTests);
-            stringBuilder.append("PackageNames: " + packageFilter).append("\n");
-            List<String> intermediate = new ArrayList<>();
-
-            for (String packageName : packageFilter) {
-                List<String> temp = getTestsForPackage(finalTests, packageName);
-                stringBuilder.append("Package: " + packageName + " has the following tests: " + temp).append("\n");
-                if (hasSubpackages(temp)) {
-                    intermediate.addAll(temp);
-                }
-            }
-
-            finalTests = new ArrayList<>();
-            finalTests.addAll(intermediate);
-        }
+        parsePackages(finalTests);
 
         return stringBuilder.toString();
     }
 
-    private Set<String> getRootPackageNames(List<String> tests) {
-        Set<String> collect = new HashSet<>();
-        collect.addAll(tests.stream()
-                .map(temp -> temp.substring(0, temp.indexOf(".")))
-                .collect(Collectors.toList()));
-        return collect;
+    private void parsePackages(List<String> tests) {
+        if (hasSubpackages(tests)) {
+            if (hasMixedClassesWithPackages(tests) > 0) {
+                removeClassesFromPackages(tests);
+                parsePackages(tests);
+            }
+            Set<String> packageFilter = getRootPackageNames(tests);
+            LOGGER.info("PackageNames: " + packageFilter);
+            for (String packageName : packageFilter) {
+                List<String> newTests = getTestsForPackage(tests, packageName);
+                LOGGER.info("In package: " + packageName + " tests: " + newTests);
+                parsePackages(newTests);
+            }
+        }
     }
 
     private boolean hasSubpackages(List<String> tests) {
@@ -143,6 +135,34 @@ public class CheckboxesViewService {
         return hasSubpackages;
     }
 
+    private int hasMixedClassesWithPackages(List<String> tests) {
+        int counter = 0;
+        for (String className : tests) {
+            if (!className.contains(".")) counter++;
+        }
+        return counter;
+    }
+
+    private List<String> removeClassesFromPackages(List<String> tests) {
+        Iterator<String> iterator = tests.iterator();
+        while (iterator.hasNext()) {
+            String className = iterator.next();
+            if (!className.contains(".")) {
+                LOGGER.info("ClassName: " + className);
+                iterator.remove();
+            }
+        }
+        return tests;
+    }
+
+    private Set<String> getRootPackageNames(List<String> tests) {
+        Set<String> collect = new HashSet<>();
+        collect.addAll(tests.stream()
+                .map(temp -> temp.substring(0, temp.indexOf(".")))
+                .collect(Collectors.toList()));
+        return collect;
+    }
+
     private List<String> getTestsForPackage(List<String> tests, String packageName) {
         List<String> collect = new ArrayList<>();
         collect.addAll(tests.stream()
@@ -151,4 +171,5 @@ public class CheckboxesViewService {
                 .collect(Collectors.toList()));
         return collect;
     }
+
 }
