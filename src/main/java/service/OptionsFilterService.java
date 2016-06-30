@@ -9,31 +9,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class OptionsFilterService {
+public class OptionsFilterService{
 
     private static final Logger LOGGER = LogManager.getLogger(OptionsFilterService.class);
 
     @Value("${package.prefix}")
-    private String prefix;
-    @Value("${framework.name.all}")
-    String keywordALL;
+    String prefix;
 
-    private Properties properties;
-    private Map<String, String> environmentSelect;
+    @Value("${framework.name.all.key}")
+    String allKey;
+    @Value("${framework.name.all.value}")
+    String allValue;
+    @Value("${framework.name.none.key}")
+    String noneKey;
+    @Value("${framework.name.none.value}")
+    String noneValue;
+    @Value("${framework.name.not.key}")
+    String notAvailableKey;
+    @Value("${framework.name.not.value}")
+    String notAvailableValue;
+
     private EnvironmentsCapsule capsule;
     private WebTestsJSONData tests;
     private SearchCriteria selectedOptions;
 
     @Autowired
-    public OptionsFilterService(EnvironmentsCapsule capsule, WebTestsJSONData tests) throws IOException {
+    public OptionsFilterService(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
         this.capsule = capsule;
         this.tests = tests;
-//        this.properties = getEndpointProperties();
     }
 
     public void setSelectedOptions(SearchCriteria selectedOptions) {
@@ -41,18 +48,19 @@ public class OptionsFilterService {
     }
 
     public Map<String, String> getJSONOptionsFilter() {
-        environmentSelect = capsule.getEnvironment();
+//      Remove the Bean encapsulation
+        Map<String, String> environmentSelect = capsule.getEnvironment();
 //      LinkedHashMap to preserve insertion order!!!
         Map<String, String> response = new LinkedHashMap<>();
         String environment = selectedOptions.getEnv();
         String testType = selectedOptions.getType();
-        List<String> testosterone = new ArrayList<>();
+        List<String> environmentTests = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : environmentSelect.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(environment)) {
                 for (Map.Entry<String, List<String>> testEntry : tests.getTests().getTests().entrySet()) {
                     if (testEntry.getKey().equalsIgnoreCase(entry.getValue())) {
-                        testosterone.addAll(testEntry.getValue());
+                        environmentTests.addAll(testEntry.getValue());
                         break;
                     }
                 }
@@ -60,29 +68,35 @@ public class OptionsFilterService {
             }
         }
 
-        if (testosterone.size() > 0) {
-            List<String> intermediate = new ArrayList<>();
+        if (environmentTests.size() > 0) {
+            List<String> environmentTestsWithoutBasePackage = new ArrayList<>();
             Set<String> basePackage = new HashSet<>();
             List<String> preFinal = new ArrayList<>();
-            for (String temp : testosterone) {
-                intermediate.add(temp.substring(prefix.length()));
-            }
-            LOGGER.info(intermediate);
-            if (testType.equals(keywordALL)) {
-                preFinal.addAll(intermediate);
+
+//          Remove basePackage prefix from classNames
+            environmentTestsWithoutBasePackage.addAll(environmentTests.stream()
+                    .map(temp -> temp.substring(prefix.length()))
+                    .collect(Collectors.toList()));
+            LOGGER.info(environmentTestsWithoutBasePackage);
+
+//          Check if the testType passed == ALL
+            if (testType.equals(allValue)) {
+                preFinal.addAll(environmentTestsWithoutBasePackage);
                 if (preFinal.size() > 0) {
-                    response.put("None", "NONE");
-                    response.put("All", "ALL");
+                    response.put(noneKey, noneValue);
+                    response.put(allKey, allValue);
                 } else {
-                    response.put("Not Available!", "NotAvailable");
+                    response.put(notAvailableKey, notAvailableValue);
                 }
             } else {
-                for (String temp : intermediate) {
-                    if (temp.startsWith(testType)) {
-                        preFinal.add(temp.substring((testType.length() + 1)));
-                    }
-                }
+//              Add all tests that have the packageName == testType
+                preFinal.addAll(environmentTestsWithoutBasePackage.stream()
+                        .filter(temp -> temp.startsWith(testType))
+                        .map(temp -> temp.substring((testType.length() + 1)))
+                        .collect(Collectors.toList()));
+//              If tests were found
                 if (preFinal.size() > 0) {
+//                  Find out if they still have subpackages
                     boolean hasSubpackages = false;
                     for (String temp : preFinal) {
                         if (temp.contains(".")) {
@@ -90,44 +104,34 @@ public class OptionsFilterService {
                             break;
                         }
                     }
+//                  If they have subPackages find them and add them to the OptionsFilter
                     if (hasSubpackages) {
-                        for (String temp : preFinal) {
-                            basePackage.add(temp.substring(0, temp.indexOf(".")));
-                        }
+                        basePackage.addAll(preFinal.stream()
+                                .map(temp -> temp.substring(0, temp.indexOf(".")))
+                                .collect(Collectors.toList()));
                         LOGGER.info(basePackage);
-                        response.put("None", "NONE");
-                        response.put("All", "ALL");
+                        response.put(noneKey, noneValue);
+                        response.put(allKey, allValue);
                         for (String temp : basePackage) {
                             response.put(temp, temp);
                         }
+//                  If there aren't any subpackages just tests, put a simple filter to show None or All
                     } else {
-                        response.put("None", "NONE");
-                        response.put("All", "ALL");
+                        response.put(noneKey, noneValue);
+                        response.put(allKey, allValue);
                     }
+//              If there are no tests that startWith testType, disable the filter
                 } else {
-                    response.put("Not Available!", "NotAvailable");
+                    response.put(notAvailableKey, notAvailableValue);
                 }
             }
             LOGGER.info(preFinal);
-
+//      If the environmentTests is empty, disable the filter
         } else {
-            response.put("Not Available!", "NotAvailable");
+            response.put(notAvailableKey, notAvailableValue);
         }
         LOGGER.info(response);
         return response;
     }
-
-    private static Properties getEndpointProperties() throws IOException {
-        Properties prop = new Properties();
-
-//      TODO document it
-        try (InputStream input = OptionsFilterService.class.getResourceAsStream("/view.properties")) {
-            // load a properties file
-            prop.load(input);
-        }
-
-        return prop;
-    }
-
 
 }
