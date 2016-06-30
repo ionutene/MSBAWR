@@ -150,11 +150,12 @@ function getCheckboxes() {
         contentType : "application/json",
         url : "/getCheckboxes",
         data : JSON.stringify(options),
-        dataType : 'json',
+        dataType : 'text',
         timeout : 100000,
         success : function(data) {
             console.log("SUCCESS_FILTER: ", data);
-//            appendOptionsFromJSON(data, "#select_filter");
+            $("#section").empty();
+            $("#section").html(data);
         },
         error : function(e) {
             console.log("ERROR_FILTER: ", e);

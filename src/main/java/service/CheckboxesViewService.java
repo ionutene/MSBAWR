@@ -33,6 +33,8 @@ public class CheckboxesViewService {
     private WebTestsJSONData tests;
     private AdvancedSearchCriteria selectedOptions;
     private List<String> finalTests;
+    private StringBuilder stringBuilder;
+    private String basePackage;
 
     @Autowired
     public CheckboxesViewService(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
@@ -97,30 +99,45 @@ public class CheckboxesViewService {
         }
         finalTests = new ArrayList<>();
         finalTests.addAll(testTypeTests);
-        LOGGER.info(finalTests);
+//        LOGGER.info(finalTests);
     }
 
     public String getHTMLDump() {
-        StringBuilder stringBuilder = new StringBuilder();
-
+        stringBuilder = new StringBuilder();
+        basePackage = selectedOptions.getFilter();
+        if (!selectedOptions.getFilter().equals(allValue)) {
+            stringBuilder.append("<ul>").append("\n");
+            stringBuilder.append("<li>").append(basePackage).append("\n");
+        }
+        basePackage += ".";
         parsePackages(finalTests);
-
+        stringBuilder.append("</li>").append("\n");
+        stringBuilder.append("</ul>").append("\n");
         return stringBuilder.toString();
     }
 
     private void parsePackages(List<String> tests) {
         if (hasSubpackages(tests)) {
-            if (hasMixedClassesWithPackages(tests) > 0) {
-                removeClassesFromPackages(tests);
-                parsePackages(tests);
-            }
             Set<String> packageFilter = getRootPackageNames(tests);
-            LOGGER.info("PackageNames: " + packageFilter);
+//            LOGGER.info("PackageNames: " + packageFilter);
+            stringBuilder.append("<ul>").append("\n");
             for (String packageName : packageFilter) {
                 List<String> newTests = getTestsForPackage(tests, packageName);
-                LOGGER.info("In package: " + packageName + " tests: " + newTests);
+                stringBuilder.append("<li>").append(packageName + " ( " + newTests.size() + " tests )").append("\n");
+//                LOGGER.info("In package: " + packageName + " tests: " + newTests);
+                if (hasMixedClassesWithPackages(newTests) > 0) {
+                    removeClassesFromPackages(newTests);
+                }
                 parsePackages(newTests);
             }
+            stringBuilder.append("</ul>").append("\n");
+        } else {
+            stringBuilder.append("<ul>").append("\n");
+            for (String test: tests) {
+                stringBuilder.append("<li>").append(test).append("</li>").append("\n");
+            }
+            stringBuilder.append("</ul>").append("\n");
+            stringBuilder.append("</li>").append("\n");
         }
     }
 
@@ -145,13 +162,16 @@ public class CheckboxesViewService {
 
     private List<String> removeClassesFromPackages(List<String> tests) {
         Iterator<String> iterator = tests.iterator();
+        stringBuilder.append("<ul>").append("\n");
         while (iterator.hasNext()) {
             String className = iterator.next();
             if (!className.contains(".")) {
-                LOGGER.info("ClassName: " + className);
+//                LOGGER.info("ClassName: " + className);
+                stringBuilder.append("<li>").append(className).append("</li>").append("\n");
                 iterator.remove();
             }
         }
+        stringBuilder.append("</ul>").append("\n");
         return tests;
     }
 
