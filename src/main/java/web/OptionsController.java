@@ -21,6 +21,7 @@ public class OptionsController {
 
     @RequestMapping(value = "/getOptions")
     public Map<String, String> getSearchResultViaAjax(@RequestBody SearchCriteria search) {
+        LOGGER.info(search);
         optionsFilterService.setSelectedOptions(search);
         return optionsFilterService.getJSONOptionsFilter();
     }

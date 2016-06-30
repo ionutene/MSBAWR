@@ -4,6 +4,7 @@
 <c:url value="/static/img/spring.png" var="springIMG"/>
 <c:url value="/static/pages/howtorun.html" var="staticHowTo"/>
 <c:url value="/static/pages/results.html" var="staticResults"/>
+<c:url value="/static/pages/checkboxesView.html" var="checkboxesView"/>
 <c:url value="/static/css/style.css" var="staticCSS"/>
 <c:url value="/static/js/jquery-3.0.0.min.js" var="staticJQuery"/>
 <c:url value="/static/js/logic.js" var="staticJS"/>
@@ -35,7 +36,8 @@
         <select id="select_filter"></select>
     </p>
     <a href="${staticHowTo}" id="aLink">How to run tests</a><br>
-    <a href="${staticResults}" id="aLink2">Results</a>
+    <a href="${staticResults}" id="aLink2">Results</a><br>
+    <a href="${checkboxesView}" id="aLink3">Checkboxes</a>
 
     <div id="checkers" hidden></div>
 </div>

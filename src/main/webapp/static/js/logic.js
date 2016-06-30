@@ -144,4 +144,23 @@ function getCheckboxes() {
     options["type"] = $("#select_type").val();
     options["filter"] = $("#select_filter").val();
     console.log(options);
+
+    $.ajax({
+        type : "POST",
+        contentType : "application/json",
+        url : "/getCheckboxes",
+        data : JSON.stringify(options),
+        dataType : 'json',
+        timeout : 100000,
+        success : function(data) {
+            console.log("SUCCESS_FILTER: ", data);
+//            appendOptionsFromJSON(data, "#select_filter");
+        },
+        error : function(e) {
+            console.log("ERROR_FILTER: ", e);
+        },
+        done : function(e) {
+            console.log("DONE");
+        }
+    });
 }

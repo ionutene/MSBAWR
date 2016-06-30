@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        #childAndParentCheckbox {
+            margin-left: 5em;
+        }
+
+        #childCheckbox {
+            margin-left: 10em;
+        }
+
+        .child1 {
+            margin-left: 50px;
+        }
+
+        .child2 {
+            margin-left: 100px;
+        }
+    </style>
+</head>
+<body>
+<form action="">
+    <input type="checkbox" id="parentCheckbox" value="event.DBListener"><label for="parentCheckbox">DBListener ( 21
+    tests )</label><br>
+    <input type="checkbox" id="childAndParentCheckbox.1" class="child1" value="event.DBListener.smoke"><label
+        for="childAndParentCheckbox.1">smoke ( 1 test )</label><br>
+    <input type="checkbox" id="childCheckbox.1" class="child2" value="event.DBListener.smoke.SmokeTestDBListener"><label
+        for="childCheckbox.1">SmokeTestDBListener</label><br>
+    <input type="checkbox" id="childAndParentCheckbox.2" class="child1" value="event.DBListener.tags"><label
+        for="childAndParentCheckbox.2">tags ( 38 tests )</label><br>
+    <input type="checkbox" id="childAndParentCheckbox.3" class="child2" value="event.DBListener.tags.BatchSize"><label
+        for="childAndParentCheckbox.3">BatchSize ( 2 tests )</label><br>
+    <input type="checkbox" id="childCheckbox.2" class="child3" value="event.DBListener.smoke.tags.BatchSize"><label
+        for="childCheckbox.2">BatchSizeNegativeTest</label><br>
+    <input type="checkbox" id="childCheckbox.3" class="child3" value="event.DBListener.smoke.tags.BatchSize"><label
+        for="childCheckbox.3">BatchSizeNegativeTest2</label><br>
+</form>
+</body>
+</html>
