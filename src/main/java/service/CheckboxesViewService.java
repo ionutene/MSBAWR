@@ -35,6 +35,16 @@ public class CheckboxesViewService {
     private List<String> finalTests;
     private StringBuilder stringBuilder;
     private String basePackage;
+    private String packageRootUntilNow;
+    private String packageRootForSingleClasses;
+    private String save;
+
+//  HTML non-sens-erie
+    private String htmlCheckboxInit = "<input type=\"checkbox\" id=\"";
+    private String htmlCheckboxIdValue = "\" value=\"";
+    private String htmlCheckboxValueLabel = "\"><label for=\"";
+    private String htmlCheckboxLabelText = "\">";
+    private String htmlCheckboxFin = "</label>";
 
     @Autowired
     public CheckboxesViewService(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
@@ -49,8 +59,7 @@ public class CheckboxesViewService {
     public void getFilteredTests() {
 //      Remove the Bean encapsulation
         Map<String, String> environmentSelect = capsule.getEnvironment();
-//      LinkedHashMap to preserve insertion order!!!
-        Map<String, String> response = new LinkedHashMap<>();
+
         String environment = selectedOptions.getEnv();
         String testType = selectedOptions.getType();
         String filter = selectedOptions.getFilter();
@@ -58,7 +67,6 @@ public class CheckboxesViewService {
         List<String> environmentTestsWithoutBasePackage = new ArrayList<>();
         List<String> testTypeTests = new ArrayList<>();
         List<String> filteredTests = new ArrayList<>();
-//        List<String> finalTests = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : environmentSelect.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(environment)) {
@@ -119,17 +127,42 @@ public class CheckboxesViewService {
         }
 
         stringBuilder.append("<ul>").append("\n");
-        stringBuilder.append("<li>").append(basePackage + " ( " + finalTests.size() + " tests )").append("\n");
+        stringBuilder.append("<li>")
+                .append(htmlCheckboxInit)
+                .append(prefix).append(basePackage.toLowerCase())
+                .append(htmlCheckboxIdValue)
+                .append(prefix).append(basePackage.toLowerCase())
+                .append(htmlCheckboxValueLabel)
+                .append(prefix).append(basePackage.toLowerCase())
+                .append(htmlCheckboxLabelText)
+                .append(basePackage).append(" ( ").append(finalTests.size()).append(" tests )")
+                .append(htmlCheckboxFin)
+                .append("\n");
 
         if (!hasSubpackages(finalTests)) {
             stringBuilder.append("<ul>").append("\n");
             for (String test: finalTests) {
-                stringBuilder.append("<li>").append(test).append("</li>").append("\n");
+                stringBuilder.append("<li>")
+                        .append(htmlCheckboxInit)
+                        .append(prefix).append(basePackage.toLowerCase()).append(".").append(test)
+                        .append(htmlCheckboxIdValue)
+                        .append(prefix).append(basePackage.toLowerCase()).append(".").append(test)
+                        .append(htmlCheckboxValueLabel)
+                        .append(prefix).append(basePackage.toLowerCase()).append(".").append(test)
+                        .append(htmlCheckboxLabelText)
+                        .append(test)
+                        .append(htmlCheckboxFin)
+                        .append("</li>").append("\n");
             }
             stringBuilder.append("</ul>").append("\n");
             stringBuilder.append("</li>").append("\n");
         } else {
-            basePackage += ".";
+            if (basePackage.equals(allKey)) {
+                packageRootUntilNow = prefix;
+            } else {
+                packageRootUntilNow = prefix + basePackage + ".";
+            }
+            packageRootForSingleClasses = packageRootUntilNow;
             parsePackages(finalTests);
         }
 
@@ -143,16 +176,30 @@ public class CheckboxesViewService {
             stringBuilder.append("<ul>").append("\n");
             for (String packageName : getRootPackageNames(tests)) {
                 List<String> newTests = getTestsForPackage(tests, packageName);
-                stringBuilder.append("<li>").append(packageName + " ( " + newTests.size() + " tests )").append("\n");
+                stringBuilder.append("<li>")
+                        .append(htmlCheckboxInit)
+                        .append(packageRootForSingleClasses).append(packageName)
+                        .append(htmlCheckboxIdValue)
+                        .append(packageRootForSingleClasses).append(packageName)
+                        .append(htmlCheckboxValueLabel)
+                        .append(packageRootForSingleClasses).append(packageName)
+                        .append(htmlCheckboxLabelText)
+                        .append(packageName).append(" ( ").append(newTests.size()).append(" tests )")
+                        .append(htmlCheckboxFin)
+                        .append("\n");
+                packageRootForSingleClasses += packageName + ".";
                 if (hasMixedClassesWithPackages(newTests) > 0) {
                     removeClassesFromPackages(newTests);
                 }
                 if (newTests.size() > 0) {
+                    save = packageRootForSingleClasses;
                     parsePackages(newTests);
                 } else {
+                    packageRootForSingleClasses = save;
                     stringBuilder.append("</li>").append("\n");
                 }
             }
+            packageRootForSingleClasses = packageRootUntilNow;
             stringBuilder.append("</ul>").append("\n");
             stringBuilder.append("</li>").append("\n");
         }
@@ -183,7 +230,17 @@ public class CheckboxesViewService {
         while (iterator.hasNext()) {
             String className = iterator.next();
             if (!className.contains(".")) {
-                stringBuilder.append("<li>").append(className).append("</li>").append("\n");
+                stringBuilder.append("<li>")
+                        .append(htmlCheckboxInit)
+                        .append(packageRootForSingleClasses).append(className)
+                        .append(htmlCheckboxIdValue)
+                        .append(packageRootForSingleClasses).append(className)
+                        .append(htmlCheckboxValueLabel)
+                        .append(packageRootForSingleClasses).append(className)
+                        .append(htmlCheckboxLabelText)
+                        .append(className)
+                        .append(htmlCheckboxFin)
+                        .append("</li>").append("\n");
                 iterator.remove();
             }
         }
