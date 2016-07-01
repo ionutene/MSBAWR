@@ -21,10 +21,9 @@ public class CheckboxesController {
 
     @RequestMapping(value = "/getCheckboxes", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getCheckboxesViaAjax(@RequestBody AdvancedSearchCriteria search) {
-//        LOGGER.info(search);
+        LOGGER.info(search);
         checkboxesViewService.setSelectedOptions(search);
         checkboxesViewService.getFilteredTests();
-//        LOGGER.info(checkboxesViewService.getHTMLDump());
         return checkboxesViewService.getHTMLDump();
     }
 }
