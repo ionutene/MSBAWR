@@ -17,7 +17,7 @@ $(document).ready(function () {
         $("#section").load(addressValue, function (response, status, xhr) {
             if (status == "error") {
                 var msg = "Sorry but there was an error: ";
-                console.log(msg + xhr.status + " " + xhr.statusText);
+                //console.log(msg + xhr.status + " " + xhr.statusText);
             }
         });
     });
@@ -75,13 +75,20 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("change", "input[type='checkbox']", function() {
+        console.log($(this).val());
+        $(this).siblings('ul')
+            .find("input[type='checkbox']")
+            .prop('checked', this.checked);
+    });
+
 });
 
 //  When handicapable remove this function and do it exclusively with JQuery
 function appendOptionsFromJSONPath(JSONPath, idName) {
     $.getJSON(JSONPath)
         .done(function (json) {
-            console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
+            //console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
             $.each(json, function (key, value) {
                 $("<option>").attr("value", value).text(key).appendTo(idName);
             })
@@ -90,7 +97,7 @@ function appendOptionsFromJSONPath(JSONPath, idName) {
 }
 
 function appendOptionsFromJSON(json, idName) {
-    console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
+    //console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
     $.each(json, function (key, value) {
         $("<option>").attr("value", value).text(key).appendTo(idName);
     });
@@ -100,7 +107,7 @@ function getFilterOptions(){
     var options = {};
     options["env"] = $('#select_envs').find('option:selected').html();
     options["type"] = $("#select_type").val();
-    console.log(options);
+    //console.log(options);
 
     $.ajax({
         type : "POST",
@@ -110,7 +117,7 @@ function getFilterOptions(){
         dataType : 'json',
         timeout : 100000,
         success : function(data) {
-            console.log("SUCCESS: ", data);
+            //console.log("SUCCESS: ", data);
             appendOptionsFromJSON(data, "#select_filter");
 
             if($('#select_filter').find('option:first').html() == "Not Available!") {
@@ -130,10 +137,10 @@ function getFilterOptions(){
 
         },
         error : function(e) {
-            console.log("ERROR: ", e);
+            //console.log("ERROR: ", e);
         },
         done : function(e) {
-            console.log("DONE");
+            //console.log("DONE");
         }
     });
 }
@@ -143,7 +150,7 @@ function getCheckboxes() {
     options["env"] = $('#select_envs').find('option:selected').html();
     options["type"] = $("#select_type").val();
     options["filter"] = $("#select_filter").val();
-    console.log(options);
+    //console.log(options);
 
     $.ajax({
         type : "POST",
@@ -153,15 +160,15 @@ function getCheckboxes() {
         dataType : 'text',
         timeout : 100000,
         success : function(data) {
-            console.log("SUCCESS_FILTER: ", data);
-            $("#section").empty();
-            $("#section").html(data);
+            //console.log("SUCCESS_FILTER: ", data);
+            $("#checkers").empty();
+            $("#checkers").html(data);
         },
         error : function(e) {
-            console.log("ERROR_FILTER: ", e);
+            //console.log("ERROR_FILTER: ", e);
         },
         done : function(e) {
-            console.log("DONE");
+            //console.log("DONE");
         }
     });
 }

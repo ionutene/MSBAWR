@@ -9,17 +9,17 @@
     line-height: 30px;
     background-color: #eeeeee;
     height: 80%;
-    width: 25%;
+    width: calc(35% - 10px);
     float: left;
     overflow: auto;
-    /*padding: 5px;*/
+    padding: 5px;
 }
 
 #section {
     height: 80%;
-    width: 75%;
+    width: calc(65% - 20px);
     float: left;
-    /*padding: 10px;*/
+    padding: 10px;
     overflow: auto;
 }
 
