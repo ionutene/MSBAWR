@@ -29,10 +29,10 @@ public class CheckboxesController {
         checkboxesViewService.setSelectedOptions(search);
         checkboxesViewService.getFilteredTests();
 
-        checkboxesTreeViewService.setSelectedOptions(search);
+/*        checkboxesTreeViewService.setSelectedOptions(search);
         checkboxesTreeViewService.getFilteredTests();
         checkboxesTreeViewService.rebuildFullPath();
-        checkboxesTreeViewService.createTreeFromPackages();
+        checkboxesTreeViewService.createTreeFromPackages();*/
 
         return checkboxesViewService.getHTMLDump();
     }
