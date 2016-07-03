@@ -38,6 +38,7 @@ public class CheckboxesViewService {
     private String packageRootUntilNow;
     private String packageRootForSingleClasses;
     private String save;
+    private String newKindOfSave;
 
 //  HTML non-sens-erie
     private String htmlCheckboxInit = "<input type=\"checkbox\" id=\"";
@@ -163,6 +164,8 @@ public class CheckboxesViewService {
                 packageRootUntilNow = prefix + basePackage + ".";
             }
             packageRootForSingleClasses = packageRootUntilNow;
+            save = packageRootUntilNow;
+            newKindOfSave = packageRootUntilNow;
             parsePackages(finalTests);
         }
 
@@ -172,6 +175,7 @@ public class CheckboxesViewService {
     }
 
     private void parsePackages(List<String> tests) {
+        newKindOfSave = packageRootForSingleClasses;
         if (hasSubpackages(tests)) {
             stringBuilder.append("<ul>").append("\n");
             for (String packageName : getRootPackageNames(tests)) {
@@ -199,10 +203,11 @@ public class CheckboxesViewService {
                     stringBuilder.append("</li>").append("\n");
                 }
             }
-            packageRootForSingleClasses = packageRootUntilNow;
+            packageRootForSingleClasses = save;
             stringBuilder.append("</ul>").append("\n");
             stringBuilder.append("</li>").append("\n");
         }
+        packageRootForSingleClasses = newKindOfSave;
     }
 
     private boolean hasSubpackages(List<String> tests) {
