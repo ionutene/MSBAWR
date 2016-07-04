@@ -6,7 +6,6 @@
 }
 
 #nav {
-    line-height: 30px;
     background-color: #eeeeee;
     height: 80%;
     width: calc(35% - 10px);
@@ -33,4 +32,10 @@
 
 ul {
     list-style-type:none;
+}
+
+/* Useful to reset the webkit-padding-left inherited from Browsers */
+.checkboxes {
+    margin: 0;
+    padding: 0;
 }

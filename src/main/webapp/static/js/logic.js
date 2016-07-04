@@ -17,7 +17,7 @@ $(document).ready(function () {
         $("#section").load(addressValue, function (response, status, xhr) {
             if (status == "error") {
                 var msg = "Sorry but there was an error: ";
-                //console.log(msg + xhr.status + " " + xhr.statusText);
+                console.log(msg + xhr.status + " " + xhr.statusText);
             }
         });
     });
@@ -35,6 +35,7 @@ $(document).ready(function () {
         $("#checkers").show();
     });
 
+//  If someone changes the Type of test some action must be taken
     $("#select_type").change(function () {
         switch ($(this).val()) {
 //          You want to define what happens when DefaultValue/Empty value is selected
@@ -55,6 +56,7 @@ $(document).ready(function () {
         }
     });
 
+//  If someone changes the Filter of test some action must be taken
     $("#select_filter").change(function () {
         switch ($(this).val()) {
 //          You want to define what happens when DefaultValue/Empty value is selected
@@ -66,15 +68,13 @@ $(document).ready(function () {
                 break;
 //          For all other cases you want to deffer the logic to the server
             default :
-                $("#checkers").hide();
-                $("#checkers").empty();
-                $("<p>").text("So many shiny checkboxes!").appendTo("#checkers");
-                $("#checkers").show();
                 getCheckboxes();
                 break;
         }
     });
 
+//  When dealing with dynamically created elements, the normal Event Handlers don't work
+//  http://api.jquery.com/on/ #Direct and delegated events
     $(document).on("change", "input[type='checkbox']", function() {
         console.log($(this).val());
         $(this).siblings('ul')
@@ -84,20 +84,20 @@ $(document).ready(function () {
 
 });
 
-//  When handicapable remove this function and do it exclusively with JQuery
+//  Function to GET JSON from an URL and insert it into a DOM Element with the name idName
+//  JSON must be a simple Map --> {"key": "value", "key2": "value2"}
 function appendOptionsFromJSONPath(JSONPath, idName) {
     $.getJSON(JSONPath)
         .done(function (json) {
-            //console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
             $.each(json, function (key, value) {
                 $("<option>").attr("value", value).text(key).appendTo(idName);
             })
         });
-//  TODO failure logging
 }
 
+//  Function to append JSON data to a DOM Element with the name idName
+//  JSON must be a simple Map --> {"key": "value", "key2": "value2"}
 function appendOptionsFromJSON(json, idName) {
-    //console.log("Dumping in: " + idName + " the following JSON: " + JSON.stringify(json));
     $.each(json, function (key, value) {
         $("<option>").attr("value", value).text(key).appendTo(idName);
     });
@@ -117,7 +117,6 @@ function getFilterOptions(){
         dataType : 'json',
         timeout : 100000,
         success : function(data) {
-            //console.log("SUCCESS: ", data);
             appendOptionsFromJSON(data, "#select_filter");
 
             if($('#select_filter').find('option:first').html() == "Not Available!") {
@@ -137,7 +136,7 @@ function getFilterOptions(){
 
         },
         error : function(e) {
-            //console.log("ERROR: ", e);
+            console.log("ERROR: ", e);
         },
         done : function(e) {
             //console.log("DONE");
@@ -160,12 +159,11 @@ function getCheckboxes() {
         dataType : 'text',
         timeout : 100000,
         success : function(data) {
-            //console.log("SUCCESS_FILTER: ", data);
             $("#checkers").empty();
             $("#checkers").html(data);
         },
         error : function(e) {
-            //console.log("ERROR_FILTER: ", e);
+            console.log("ERROR_FILTER: ", e);
         },
         done : function(e) {
             //console.log("DONE");

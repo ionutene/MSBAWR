@@ -116,7 +116,7 @@ public class CheckboxesViewService {
         String parentName = "";
 
 //      Start the Unordered List
-        stringBuilder.append("<ul>").append("\n");
+        stringBuilder.append("<ul class=\"checkboxes\">").append("\n");
 
 //      Type = ALL && Filter = ALL
         if (selectedOptions.getType().equals(allValue) && selectedOptions.getFilter().equals(allValue)) {

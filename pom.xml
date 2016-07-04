@@ -34,6 +34,12 @@
             </exclusions>
         </dependency>
 
+        <!--<dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-core</artifactId>
+            <version>4.3.0.RELEASE</version>
+        </dependency>-->
+
         <!-- Need this for json to/from object -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -90,6 +96,12 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>${servletapi.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.53</version>
         </dependency>
 
     </dependencies>
