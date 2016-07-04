@@ -62,6 +62,11 @@ public class UtilsSsh {
                 stringBuilder.append(line).append("\n");
             }
 
+            if (stringBuilder.length() > 0) {
+//              Delete last \n appended
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            }
+
             channel.disconnect();
 
         } catch (Exception e) {
@@ -91,6 +96,54 @@ public class UtilsSsh {
 
         return stringBuilder.toString();
     }
+
+    /*public static String executeCommand(String command, Session sshConn, boolean displayCommandResult) throws Exception{
+        String result = "";
+        InputStreamReader isr = null;
+        BufferedReader in = null;
+        InputStreamReader esr = null;
+        BufferedReader ine = null;
+        try{
+            ChannelExec channel = (ChannelExec)sshConn.openChannel("exec");
+            channel.setCommand(command);
+            channel.connect();
+
+            isr = new InputStreamReader(channel.getInputStream());
+            in = new BufferedReader(isr);
+
+            esr = new InputStreamReader(channel.getErrStream());
+            ine = new BufferedReader(esr);
+
+            String line = null;
+            String lineError = null;
+            while (  ((line = in.readLine()) != null) || (lineError = ine.readLine()) != null ){
+                if (lineError != null ){
+                    LOGGER.warn("Executing command: <"+ command +"> with error:" + lineError);
+                    return lineError;
+                }
+                if (displayCommandResult){
+                    LOGGER.info("Command Result: " + line);
+                }
+                result = result + line + "\n";
+            }
+
+
+            channel.disconnect();
+            if (result.length() > 0){
+                return result.substring(0, result.length() -1);
+            }else{
+                return result;
+            }
+        }catch (Exception e) {
+            LOGGER.error("Error during <executeCommand>:" + e);
+            return e.getMessage();
+        }finally{
+            ine.close();
+            esr.close();
+            in.close();
+            isr.close();
+        }
+    }*/
 
 
     public static boolean CopySftpFileToSftpFile(String sourceFile, Session sourceFileSession, String targetFile, Session targetFileSession) throws Exception {
@@ -124,7 +177,7 @@ public class UtilsSsh {
         String buildNumber = executeCommand(command, sshConn, true);
 
         if ((buildNumber.length() - buildNumber.replace("#", "").length()) > 1) {
-            System.out.println("The build number couldn't be taken from <" + subFolder + ">. It was:" + buildNumber);
+            LOGGER.warn("The build number couldn't be taken from <" + subFolder + ">. It was:" + buildNumber);
             return null;
         }
 
@@ -133,10 +186,10 @@ public class UtilsSsh {
         String filePath = executeCommand(command, sshConn, true);
 
         if ((filePath.length() - filePath.replace(fileType, "").length()) > fileType.length()) {
-            System.out.println("The are more <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
+            LOGGER.warn("The are more <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
             return null;
         } else if ((filePath.length() - filePath.replace(fileType, "").length()) < fileType.length()) {
-            System.out.println("The are NO <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
+            LOGGER.warn("The are NO <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
             return null;
         }
 

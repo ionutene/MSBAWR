@@ -5,10 +5,14 @@ import com.jcraft.jsch.Session;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySource("classpath:connection.properties")
+@PropertySources({
+        @PropertySource("classpath:connection.properties"),
+        @PropertySource("classpath:server.properties")
+})
 public class UnixConfig {
 
     public static Session initSSHAuth(String host, String port, String userName, String password) throws Exception {
