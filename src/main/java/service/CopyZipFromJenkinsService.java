@@ -2,18 +2,18 @@ package service;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import net.lingala.zip4j.core.ZipFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import service.old.UtilsSsh;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CopyZipFromJenkinsService {
@@ -50,7 +50,6 @@ public class CopyZipFromJenkinsService {
     private Session jenkinsSession;
 
     public String getInstallPath() {
-        LOGGER.info(jenkinsHost);
         String result = "NO_BONO";
         try {
 //            localSession = UtilsSsh.initSSHAuth(localHost, localPort, localUserName, localPassword);
@@ -60,33 +59,42 @@ public class CopyZipFromJenkinsService {
             LOGGER.error(e);
         }
         try {
-            result = UtilsSsh.getInstallerKitPath(jenkinsProject, jenkinsApproved,
+            String installerKitPath = UtilsSsh.getInstallerKitPath(jenkinsProject, jenkinsApproved,
                     ".zip", jenkinsSession);
-            LOGGER.info(result);
 
-            String kitFileName = result.substring(result.lastIndexOf("/") + 1);
+            String kitFileName = installerKitPath.substring(installerKitPath.lastIndexOf("/") + 1);
             LOGGER.info("Looking for: " + kitFileName);
 
-            // check if the .Zip file already exist
-            LOGGER.info("Check if the .Zip file already exist<br/>");
-            File localDir = new File(regressionFrameworkLocation);
-            boolean found = false;
-            for (String aux : localDir.list()) {
-                if (aux.equals(kitFileName)) {
-                    found = true;
-                    LOGGER.info("The .zip file already exist:" + aux + "<br/>");
-                    break;
-                }
-            }
-            findJar(kitFileName);
-            // if other clean up the folder
-            if (!found) {
+            LOGGER.info("Check if the .zip file exists<br/>");
+            // check if the .zip file exists, if it doesn't clean up the folder
+            if (!findFileInPath(kitFileName, regressionFrameworkLocation)) {
                 LOGGER.info("Clean-up the folder<br/>");
+                deleteDirectory(regressionFrameworkLocation);
+                createDirectory(regressionFrameworkLocation);
 
-/*                CmdRun clearCmd = new CmdRun("rm -rf " + regressionFrameworkLocation + "*", out, false, "", false);
-                clearCmd.run();*/
+                // copy the new .zip file
+                LOGGER.info("Copy the new .zip file<br/>");
+                UtilsSsh.CopySftpFileToFile(installerKitPath, jenkinsSession, regressionFrameworkLocation + kitFileName);
+                // Unzip and overwrite files silently
+                LOGGER.info("Unzip and overwrite files silently<br/>");
+                ZipFile zipFile = new ZipFile(regressionFrameworkLocation + kitFileName);
+                zipFile.extractAll(regressionFrameworkLocation);
+            }
+            for (Path fileToDelete : findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar,war}")) {
+                Files.delete(fileToDelete);
             }
 
+            // get the latest build from jenkins
+            LOGGER.info("Get the latest build from jenkins<br/>");
+            String latestBuildPath = UtilsSsh.getLatestBuildPath(jenkinsProject, ".jar", jenkinsSession);
+            String buildFileName = latestBuildPath.substring(latestBuildPath.lastIndexOf("/") + 1);
+
+            // copy the latest build
+            LOGGER.info("Copy the latest build<br/>");
+            UtilsSsh.CopySftpFileToFile(latestBuildPath, jenkinsSession, regressionFrameworkLocation + buildFileName);
+
+            JarClassLoader jarClassLoader = new JarClassLoader(Paths.get(regressionFrameworkLocation + buildFileName).toUri().toURL());
+            jarClassLoader.invokeClass("net.metrosystems.msb.main.Main", new String[]{"webtests"});
 
         } catch (Exception e) {
             LOGGER.error(e);
@@ -96,20 +104,44 @@ public class CopyZipFromJenkinsService {
         return result;
     }
 
-    private boolean findJar(String zipToFind) {
-        Path path = Paths.get(regressionFrameworkLocation);
-        //no filter applied
-        LOGGER.info("\nNo filter applied:");
-//        ds = Files.newDirectoryStream(path, "*.{png,jpg,bmp}")
-        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
+    private List<Path> findFilesInPathWithPattern(String pathToSearch, String pattern) throws IOException {
+        List<Path> filesFound = new ArrayList<>();
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(Paths.get(pathToSearch), pattern)) {
             for (Path file : ds) {
-                LOGGER.info(file.getFileName());
-                if (zipToFind.equals(file.getFileName().toString()))
+                filesFound.add(file);
+            }
+        }
+        return filesFound;
+    }
+
+    private boolean findFileInPath(String fileToFind, String pathToSearch) throws IOException {
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(Paths.get(pathToSearch))) {
+            for (Path file : ds) {
+//                LOGGER.info(file.getFileName());
+                if (fileToFind.equals(file.getFileName().toString()))
                     return true;
             }
-        }catch(IOException e) {
-            LOGGER.error(e);
         }
         return false;
+    }
+
+    private void deleteDirectory(String directoryPath) throws IOException {
+        Files.walkFileTree(Paths.get(directoryPath), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    private void createDirectory(String directoryPath) throws IOException {
+        Files.createDirectory(FileSystems.getDefault().getPath(directoryPath));
     }
 }

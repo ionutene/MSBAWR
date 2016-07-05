@@ -8,6 +8,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class UtilsSsh {
@@ -144,6 +146,23 @@ public class UtilsSsh {
             isr.close();
         }
     }*/
+
+    public static boolean CopySftpFileToFile(String sourceFile, Session sourceFileSession, String targetFile) throws Exception {
+
+        ChannelSftp channelSourceSftp = (ChannelSftp) sourceFileSession.openChannel("sftp");
+        channelSourceSftp.connect();
+
+        InputStream is = channelSourceSftp.get(sourceFile);
+        Files.copy(is, Paths.get(targetFile));
+        is.close();
+        channelSourceSftp.disconnect();
+
+        if (Files.notExists(Paths.get(targetFile))) {
+            LOGGER.warn("The file wasn't copied: " + targetFile);
+            return false;
+        }
+        return true;
+    }
 
 
     public static boolean CopySftpFileToSftpFile(String sourceFile, Session sourceFileSession, String targetFile, Session targetFileSession) throws Exception {
