@@ -99,54 +99,6 @@ public class UtilsSsh {
         return stringBuilder.toString();
     }
 
-    /*public static String executeCommand(String command, Session sshConn, boolean displayCommandResult) throws Exception{
-        String result = "";
-        InputStreamReader isr = null;
-        BufferedReader in = null;
-        InputStreamReader esr = null;
-        BufferedReader ine = null;
-        try{
-            ChannelExec channel = (ChannelExec)sshConn.openChannel("exec");
-            channel.setCommand(command);
-            channel.connect();
-
-            isr = new InputStreamReader(channel.getInputStream());
-            in = new BufferedReader(isr);
-
-            esr = new InputStreamReader(channel.getErrStream());
-            ine = new BufferedReader(esr);
-
-            String line = null;
-            String lineError = null;
-            while (  ((line = in.readLine()) != null) || (lineError = ine.readLine()) != null ){
-                if (lineError != null ){
-                    LOGGER.warn("Executing command: <"+ command +"> with error:" + lineError);
-                    return lineError;
-                }
-                if (displayCommandResult){
-                    LOGGER.info("Command Result: " + line);
-                }
-                result = result + line + "\n";
-            }
-
-
-            channel.disconnect();
-            if (result.length() > 0){
-                return result.substring(0, result.length() -1);
-            }else{
-                return result;
-            }
-        }catch (Exception e) {
-            LOGGER.error("Error during <executeCommand>:" + e);
-            return e.getMessage();
-        }finally{
-            ine.close();
-            esr.close();
-            in.close();
-            isr.close();
-        }
-    }*/
-
     public static boolean CopySftpFileToFile(String sourceFile, Session sourceFileSession, String targetFile) throws Exception {
 
         ChannelSftp channelSourceSftp = (ChannelSftp) sourceFileSession.openChannel("sftp");
