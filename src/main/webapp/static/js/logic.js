@@ -22,6 +22,15 @@ $(document).ready(function () {
         });
     });
 
+    $("#reindex").click( function(e) {
+        e.preventDefault();
+        console.log("Click worked!");
+        $(this).prop("disabled", true);
+        doReindex();
+        $(this).prop("disabled", false);
+        console.log("And we're out of here!");
+    });
+
 //  RESET if someone changes the Environment
     $("#select_envs").change(function () {
         $("#select_type").prop('selectedIndex',0);
@@ -161,6 +170,26 @@ function getCheckboxes() {
         success : function(data) {
             $("#checkers").empty();
             $("#checkers").html(data);
+        },
+        error : function(e) {
+            console.log("ERROR_FILTER: ", e);
+        },
+        done : function(e) {
+            //console.log("DONE");
+        }
+    });
+}
+
+function doReindex() {
+    $.ajax({
+        type : "GET",
+        contentType : "text/plain",
+        url : "/getZip",
+        dataType : 'text',
+        timeout : 100000,
+        success : function(data) {
+            $("#section").empty();
+            $("#section").html(data);
         },
         error : function(e) {
             console.log("ERROR_FILTER: ", e);

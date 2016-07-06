@@ -4,14 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import service.ReindexTestsService;
 
 import javax.servlet.ServletResponse;
 import java.io.IOException;
 
-@RestController
+@Controller
 public class ReindexTestsController {
 
     private static final Logger LOGGER = LogManager.getLogger(ReindexTestsController.class);

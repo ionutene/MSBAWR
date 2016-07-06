@@ -43,6 +43,7 @@ public class ReindexTestsService {
     public void reindexTests(PrintWriter writer) {
         try {
 
+
             String installerKitPath = UtilsSsh.getInstallerKitPath(jenkinsProject, jenkinsApproved,
                     ".zip", jenkinsSession);
 

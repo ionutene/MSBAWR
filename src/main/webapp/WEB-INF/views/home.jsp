@@ -2,6 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <c:url value="/static/img/spring.png" var="springIMG"/>
+<c:url value="/static/img/reload.png" var="reloadIMG"/>
 <c:url value="/static/pages/howtorun.html" var="staticHowTo"/>
 <c:url value="/static/pages/results.html" var="staticResults"/>
 <c:url value="/static/pages/checkboxesView.html" var="checkboxesView"/>
@@ -30,16 +31,22 @@
     <p>Select Environment:
         <select id="select_envs"></select>
     </p>
+
     <p>Select Test Type:
         <select id="select_type"></select>
     </p>
+
     <p>Select Filter:
         <select id="select_filter"></select>
     </p>
     <a href="${staticHowTo}" id="aLink">How to run tests</a><br>
     <a href="${staticResults}" id="aLink2">Results</a><br>
     <a href="${checkboxesView}" id="aLink3">Checkboxes</a><br>
-    <a href="${servletZip}" id="aLink4">Zip</a><br>
+
+    <form action="">
+        <input type="image" id="reindex" src="${reloadIMG}" alt="Submit"/>
+    </form>
+    <br>
 
     <div id="checkers" hidden></div>
 </div>
