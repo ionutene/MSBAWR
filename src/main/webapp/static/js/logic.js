@@ -21,15 +21,13 @@ $(document).ready(function () {
             }
         });
     });
-
+/*
     $("#reindex").click( function(e) {
         e.preventDefault();
         console.log("Click worked!");
         $(this).prop("disabled", true);
         doReindex();
-        $(this).prop("disabled", false);
-        console.log("And we're out of here!");
-    });
+    });*/
 
 //  RESET if someone changes the Environment
     $("#select_envs").change(function () {
@@ -187,9 +185,16 @@ function doReindex() {
         url : "/getZip",
         dataType : 'text',
         timeout : 100000,
+        async: false,
         success : function(data) {
             $("#section").empty();
+            console.log(data);
             $("#section").html(data);
+            /*$.each(data, function (key) {
+                $("#section").append(key);
+            });*/
+            $("#reindex").prop("disabled", false);
+            console.log("And we're out of here!");
         },
         error : function(e) {
             console.log("ERROR_FILTER: ", e);

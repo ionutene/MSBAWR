@@ -1,5 +1,8 @@
 package util;
 
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+
 import java.io.*;
 
 public class RuntimeProcessesUtil {
@@ -17,6 +20,14 @@ public class RuntimeProcessesUtil {
         while (((line = r.readLine()) != null)) {
             writer.println(line);
             writer.flush();
+        }
+    }
+
+    public static void printCMDToWriter(InputStream stream, WebSocketSession session) throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
+        String line;
+        while (((line = r.readLine()) != null)) {
+            session.sendMessage(new TextMessage(line));
         }
     }
 }

@@ -24,7 +24,7 @@ public class UnixConfig {
     private String jenkinsPassword;
 
     @Bean
-    @Scope(value = "prototype")
+    @Scope(value="request", proxyMode= ScopedProxyMode.TARGET_CLASS)
     public Session initSSHAuth() throws JSchException {
         Session sshCon;
 

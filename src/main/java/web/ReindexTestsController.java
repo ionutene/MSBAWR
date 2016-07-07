@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import service.ReindexTestsService;
 
-import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Controller
@@ -20,7 +20,7 @@ public class ReindexTestsController {
     ReindexTestsService reindexTestsService;
 
     @RequestMapping(value = "/getZip", produces = MediaType.TEXT_HTML_VALUE)
-    public void getReIndexedTests(ServletResponse response) {
+    public void getReIndexedTests(HttpServletResponse response) {
         try {
             reindexTestsService.reindexTests(response.getWriter());
         } catch (IOException e) {
