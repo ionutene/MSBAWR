@@ -1,5 +1,6 @@
 package util;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -28,6 +29,14 @@ public class RuntimeProcessesUtil {
         String line;
         while (((line = r.readLine()) != null)) {
             session.sendMessage(new TextMessage(line));
+        }
+    }
+
+    public static void printCMDToWriter(InputStream stream, SimpMessagingTemplate messagingTemplate) throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
+        String line;
+        while (((line = r.readLine()) != null)) {
+            messagingTemplate.convertAndSend(line);
         }
     }
 }

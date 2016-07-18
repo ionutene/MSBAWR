@@ -3,12 +3,39 @@ $(document).ready(function () {
 //  Start with the last Select disabled and an action message at the bottom of the Selects
     $('#select_filter').empty();
     $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
-    $('#select_filter').prop("disabled", true );
+    $('#select_filter').prop("disabled", true);
 
     $("#checkers").hide();
     $("#checkers").empty();
     $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
     $("#checkers").show();
+
+    var webSocket,
+        serviceLocation = '/section',
+        stompClient = null;
+
+    var stompHeader = {
+        login: 'mylogin',
+        passcode: 'mypasscode',
+        // additional header
+        'client-id': 'my-client-id'
+    };
+
+    webSocket = new SockJS(serviceLocation);
+    stompClient = Stomp.over(webSocket);
+    stompClient.connect(stompHeader, connectCallback, errorCallback);
+
+    var connectCallback = function (frame) {
+            stompClient.subscribe('/topic/message', function (calResult) {
+                // Receives a message.
+                console.log(calResult.body);
+                $("#section").append(calResult.body);
+            });
+        },
+
+        errorCallback = function (error) {
+            console.error("ERROR_STOMP: ", error.headers.message);
+        };
 
     $("a").click(function (e) {
         e.preventDefault();
@@ -21,20 +48,22 @@ $(document).ready(function () {
             }
         });
     });
-/*
-    $("#reindex").click( function(e) {
+
+    $("#reindex").click(function (e) {
         e.preventDefault();
         console.log("Click worked!");
-        $(this).prop("disabled", true);
-        doReindex();
-    });*/
+        // Write your code in the same way as for native WebSocket:
+//        ws.send("Get latest .zip!");
+        $("#section").empty();
+        stompClient.send('/app/section', {}, "reindex");
+    });
 
 //  RESET if someone changes the Environment
     $("#select_envs").change(function () {
-        $("#select_type").prop('selectedIndex',0);
+        $("#select_type").prop('selectedIndex', 0);
         $('#select_filter').empty();
         $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
-        $('#select_filter').prop("disabled", true );
+        $('#select_filter').prop("disabled", true);
 
         $("#checkers").hide();
         $("#checkers").empty();
@@ -49,7 +78,7 @@ $(document).ready(function () {
             case "NONE":
                 $('#select_filter').empty();
                 $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
-                $('#select_filter').prop("disabled", true );
+                $('#select_filter').prop("disabled", true);
                 $("#checkers").hide();
                 $("#checkers").empty();
                 $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
@@ -82,7 +111,7 @@ $(document).ready(function () {
 
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
-    $(document).on("change", "input[type='checkbox']", function() {
+    $(document).on("change", "input[type='checkbox']", function () {
         console.log($(this).val());
         $(this).siblings('ul')
             .find("input[type='checkbox']")
@@ -110,31 +139,31 @@ function appendOptionsFromJSON(json, idName) {
     });
 }
 
-function getFilterOptions(){
+function getFilterOptions() {
     var options = {};
     options["env"] = $('#select_envs').find('option:selected').html();
     options["type"] = $("#select_type").val();
     //console.log(options);
 
     $.ajax({
-        type : "POST",
-        contentType : "application/json",
-        url : "/getOptions",
-        data : JSON.stringify(options),
-        dataType : 'json',
-        timeout : 100000,
-        success : function(data) {
+        type: "POST",
+        contentType: "application/json",
+        url: "/getOptions",
+        data: JSON.stringify(options),
+        dataType: 'json',
+        timeout: 100000,
+        success: function (data) {
             appendOptionsFromJSON(data, "#select_filter");
 
-            if($('#select_filter').find('option:first').html() == "Not Available!") {
-                $('#select_filter').prop("disabled", true );
+            if ($('#select_filter').find('option:first').html() == "Not Available!") {
+                $('#select_filter').prop("disabled", true);
                 $("#checkers").hide();
                 $("#checkers").empty();
                 $("<p>").text("No tests available, please select another Test Type or Environment!").appendTo("#checkers");
                 $("#checkers").show();
 
             } else {
-                $('#select_filter').prop("disabled", false );
+                $('#select_filter').prop("disabled", false);
                 $("#checkers").hide();
                 $("#checkers").empty();
                 $("<p>").text("Here is where the checkboxes will be, please select a filter!").appendTo("#checkers");
@@ -142,10 +171,10 @@ function getFilterOptions(){
             }
 
         },
-        error : function(e) {
+        error: function (e) {
             console.log("ERROR: ", e);
         },
-        done : function(e) {
+        done: function (e) {
             //console.log("DONE");
         }
     });
@@ -159,20 +188,20 @@ function getCheckboxes() {
     //console.log(options);
 
     $.ajax({
-        type : "POST",
-        contentType : "application/json",
-        url : "/getCheckboxes",
-        data : JSON.stringify(options),
-        dataType : 'text',
-        timeout : 100000,
-        success : function(data) {
+        type: "POST",
+        contentType: "application/json",
+        url: "/getCheckboxes",
+        data: JSON.stringify(options),
+        dataType: 'text',
+        timeout: 100000,
+        success: function (data) {
             $("#checkers").empty();
             $("#checkers").html(data);
         },
-        error : function(e) {
+        error: function (e) {
             console.log("ERROR_FILTER: ", e);
         },
-        done : function(e) {
+        done: function (e) {
             //console.log("DONE");
         }
     });
@@ -180,27 +209,46 @@ function getCheckboxes() {
 
 function doReindex() {
     $.ajax({
-        type : "GET",
-        contentType : "text/plain",
-        url : "/getZip",
-        dataType : 'text',
-        timeout : 100000,
+        type: "GET",
+        contentType: "text/plain",
+        url: "/getZip",
+        dataType: 'text',
+        timeout: 100000,
         async: false,
-        success : function(data) {
+        success: function (data) {
             $("#section").empty();
             console.log(data);
             $("#section").html(data);
             /*$.each(data, function (key) {
-                $("#section").append(key);
-            });*/
+             $("#section").append(key);
+             });*/
             $("#reindex").prop("disabled", false);
             console.log("And we're out of here!");
         },
-        error : function(e) {
+        error: function (e) {
             console.log("ERROR_FILTER: ", e);
         },
-        done : function(e) {
+        done: function (e) {
             //console.log("DONE");
         }
     });
+}
+
+function webSockety() {
+    // Write your code in the same way as for native WebSocket:
+    var ws = new WebSocket("ws://localhost:8080/WebSockety");
+    ws.onopen = function () {
+        ws.send("GET_ZIP");  // Sends a message.
+    };
+    ws.onmessage = function (e) {
+        // Receives a message.
+        console.log(e.data);
+    };
+    ws.onerror = function (e) {
+        console.log(e);
+    };
+    ws.onclose = function () {
+        console.log("closed");
+        ws.send("CLOSE");
+    };
 }

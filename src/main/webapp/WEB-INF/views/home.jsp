@@ -6,10 +6,11 @@
 <c:url value="/static/pages/howtorun.html" var="staticHowTo"/>
 <c:url value="/static/pages/results.html" var="staticResults"/>
 <c:url value="/static/pages/checkboxesView.html" var="checkboxesView"/>
-<c:url value="/getZipper" var="servletZip"/>
 <c:url value="/static/css/style.css" var="staticCSS"/>
 <c:url value="/static/js/jquery-3.0.0.min.js" var="staticJQuery"/>
 <c:url value="/static/js/logic.js" var="staticJS"/>
+<c:url value="/static/js/sockjs-1.1.1.min.js" var="staticSockJS"/>
+<c:url value="/static/js/stomp.min.js" var="staticSTOMP"/>
 <c:url value="/static/json/envCorrelation.json" var="staticEnvironments"/>
 <c:url value="/static/json/testTypes.json" var="staticTestTypes"/>
 
@@ -19,6 +20,8 @@
     <link rel="stylesheet" type="text/css" href="${staticCSS}">
     <script type="text/javascript" src="${staticJQuery}"></script>
     <script type="text/javascript" src="${staticJS}"></script>
+    <script type="text/javascript" src="${staticSockJS}"></script>
+    <script type="text/javascript" src="${staticSTOMP}"></script>
     <script type="text/javascript">appendOptionsFromJSONPath("${staticEnvironments}", "#select_envs");</script>
     <script type="text/javascript">appendOptionsFromJSONPath("${staticTestTypes}", "#select_type");</script>
 </head>
@@ -43,7 +46,7 @@
     <a href="${staticResults}" id="aLink2">Results</a><br>
     <a href="${checkboxesView}" id="aLink3">Checkboxes</a><br>
 
-    <form action="${servletZip}">
+    <form action="">
         <input type="image" id="reindex" src="${reloadIMG}" alt="Submit"/>
     </form>
     <br>
