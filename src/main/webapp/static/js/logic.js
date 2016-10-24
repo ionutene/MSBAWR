@@ -1,5 +1,18 @@
 $(document).ready(function () {
 
+    var stompConnectCallback = function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/message', function (calResult) {
+                // Receives a message.
+                console.log(calResult.body);
+                $("#section").append(calResult.body);
+            });
+        },
+
+        stompErrorCallback = function (error) {
+            console.log("ERROR_STOMP: ", error.headers.message);
+        };
+
 //  Start with the last Select disabled and an action message at the bottom of the Selects
     $('#select_filter').empty();
     $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
@@ -23,19 +36,9 @@ $(document).ready(function () {
 
     webSocket = new SockJS(serviceLocation);
     stompClient = Stomp.over(webSocket);
-    stompClient.connect(stompHeader, connectCallback, errorCallback);
+    stompClient.connect({}, stompConnectCallback, stompErrorCallback);
 
-    var connectCallback = function (frame) {
-            stompClient.subscribe('/topic/message', function (calResult) {
-                // Receives a message.
-                console.log(calResult.body);
-                $("#section").append(calResult.body);
-            });
-        },
 
-        errorCallback = function (error) {
-            console.error("ERROR_STOMP: ", error.headers.message);
-        };
 
     $("a").click(function (e) {
         e.preventDefault();

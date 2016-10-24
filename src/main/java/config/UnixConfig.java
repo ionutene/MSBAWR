@@ -6,6 +6,7 @@ import com.jcraft.jsch.Session;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.web.context.WebApplicationContext;
 
 @Configuration
 @PropertySources({
@@ -24,7 +25,7 @@ public class UnixConfig {
     private String jenkinsPassword;
 
     @Bean
-    @Scope(value="request", proxyMode= ScopedProxyMode.TARGET_CLASS)
+    @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public Session initSSHAuth() throws JSchException {
         Session sshCon;
 

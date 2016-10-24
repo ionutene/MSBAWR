@@ -32,11 +32,12 @@ public class RuntimeProcessesUtil {
         }
     }
 
-    public static void printCMDToWriter(InputStream stream, SimpMessagingTemplate messagingTemplate) throws IOException {
+    public static void printCMDToWriter(InputStream stream, String destination,
+                                        SimpMessagingTemplate messagingTemplate) throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(stream));
         String line;
         while (((line = r.readLine()) != null)) {
-            messagingTemplate.convertAndSend(line);
+            messagingTemplate.convertAndSend(destination, line + "<br/>");
         }
     }
 }

@@ -19,7 +19,7 @@ import java.nio.file.Path;
 @Service
 public class WebSocketReindexTestsService {
 
-    private static final Logger LOGGER = LogManager.getLogger(ReindexTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(WebSocketReindexTestsService.class);
 
     @Value("${jenkins.host}")
     private String jenkinsHost;
@@ -47,10 +47,10 @@ public class WebSocketReindexTestsService {
     @Value("${os.cmd.option}")
     private String osCMDOption;
 
-//    @Autowired
+    //    @Autowired
     private Session jenkinsSession;
 
-    public void webSocketReindexTests(SimpMessagingTemplate session) throws Exception {
+    public void webSocketReindexTests(String destination, SimpMessagingTemplate payload) throws Exception {
         try {
 
             jenkinsSession = initSSHAuth();
@@ -59,27 +59,27 @@ public class WebSocketReindexTestsService {
                     ".zip", jenkinsSession);
 
             String kitFileName = installerKitPath.substring(installerKitPath.lastIndexOf("/") + 1);
-            session.convertAndSend("Looking for: " + kitFileName);
+            payload.convertAndSend(destination, "Looking for: " + kitFileName);
             LOGGER.info("Looking for: " + kitFileName);
 
-            session.convertAndSend("Check if the .zip file exists<br/>");
+            payload.convertAndSend(destination, "Check if the .zip file exists<br/>");
             LOGGER.info("Check if the .zip file exists<br/>");
             // check if the .zip file exists, if it doesn't clean up the folder
             if (!FilesAndDirectoryUtil.findFileInPath(kitFileName, regressionFrameworkLocation)) {
                 LOGGER.info("Clean-up the folder<br/>");
-                session.convertAndSend("Clean-up the folder<br/>");
+                payload.convertAndSend(destination, "Clean-up the folder<br/>");
 
                 FilesAndDirectoryUtil.deleteDirectory(regressionFrameworkLocation);
                 FilesAndDirectoryUtil.createDirectory(regressionFrameworkLocation);
 
                 // copy the new .zip file
                 LOGGER.info("Copy the new .zip file<br/>");
-                session.convertAndSend("Copy the new .zip file<br/>");
+                payload.convertAndSend(destination, "Copy the new .zip file<br/>");
 
                 UtilsSsh.CopySftpFileToFile(installerKitPath, jenkinsSession, regressionFrameworkLocation + kitFileName);
                 // Unzip and overwrite files silently
                 LOGGER.info("Unzip and overwrite files silently<br/>");
-                session.convertAndSend("Unzip and overwrite files silently<br/>");
+                payload.convertAndSend(destination, "Unzip and overwrite files silently<br/>");
 
                 ZipFile zipFile = new ZipFile(regressionFrameworkLocation + kitFileName);
                 zipFile.extractAll(regressionFrameworkLocation);
@@ -90,34 +90,34 @@ public class WebSocketReindexTestsService {
 
             // get the latest build from jenkins
             LOGGER.info("Get the latest build from jenkins<br/>");
-            session.convertAndSend("Get the latest build from jenkins<br/>");
+            payload.convertAndSend(destination, "Get the latest build from jenkins<br/>");
 
             String latestBuildPath = UtilsSsh.getLatestBuildPath(jenkinsProject, ".jar", jenkinsSession);
             String buildFileName = latestBuildPath.substring(latestBuildPath.lastIndexOf("/") + 1);
 
             // copy the latest build
             LOGGER.info("Copy the latest build<br/>");
-            session.convertAndSend("Copy the latest build<br/>");
+            payload.convertAndSend(destination, "Copy the latest build<br/>");
 
             UtilsSsh.CopySftpFileToFile(latestBuildPath, jenkinsSession, regressionFrameworkLocation + buildFileName);
 
             // execute generation of tests.xml
             LOGGER.info("Execute generation of tests.xml<br/>");
-            session.convertAndSend("Execute generation of tests.xml<br/>");
+            payload.convertAndSend(destination, "Execute generation of tests.xml<br/>");
 
             String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + buildFileName + " webtests";
             LOGGER.info(commandToExecute);
-            session.convertAndSend(commandToExecute);
+            payload.convertAndSend(destination, commandToExecute + "<br/>");
 
             Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
-            RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), session);
+            RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, payload);
 
         } finally {
             jenkinsSession.disconnect();
         }
     }
 
-    public Session initSSHAuth() throws JSchException {
+    private Session initSSHAuth() throws JSchException {
         Session sshCon;
 
         JSch jsch = new JSch();

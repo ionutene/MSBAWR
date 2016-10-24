@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
@@ -22,14 +23,11 @@ public class WebSocketController {
 
     @Async
     @MessageMapping("/section")
-//    @SendTo("/topic/message")
+    @SendTo("/topic/message")
     public void result(String message) throws Exception {
+        if (message != null && message.equals("reindex"))
+            webSocketReindexTestsService.webSocketReindexTests("/topic/message", template);
 
-
-//        WebSocketConfig.JOBS.add()
-        if (message != null && message.equals("reindex")) LOGGER.info("LOLEX!");
-        template.convertAndSend("/topic/message", "First Try!");
-        template.convertAndSend("/topic/message", "Second Try!");
-        webSocketReindexTestsService.webSocketReindexTests(template);
     }
+
 }
