@@ -49,8 +49,9 @@
 
     <form action="">
         <input type="image" id="reindex" src="${reloadIMG}" alt="Submit"/>
+        <input type="submit" id="submitTests" value="Run" hidden>
+        <input type="submit" id="cancelTests" value="Stop" hidden>
     </form>
-    <br>
 
     <div id="checkers" hidden></div>
 </div>

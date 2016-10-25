@@ -54,11 +54,13 @@ $(document).ready(function () {
 
     $("#reindex").click(function (e) {
         e.preventDefault();
-        console.log("Click worked!");
-        // Write your code in the same way as for native WebSocket:
-//        ws.send("Get latest .zip!");
         $("#section").empty();
         stompClient.send('/app/section', {}, "reindex");
+    });
+    
+    $("#submitTests").click(function (e) {
+        e.preventDefault();
+        collectValuesFromCheckboxes();
     });
 
 //  RESET if someone changes the Environment
@@ -200,6 +202,8 @@ function getCheckboxes() {
         success: function (data) {
             $("#checkers").empty();
             $("#checkers").html(data);
+            $("#submitTests").show();
+            $("#cancelTests").show();
         },
         error: function (e) {
             console.log("ERROR_FILTER: ", e);
@@ -254,4 +258,32 @@ function webSockety() {
         console.log("closed");
         ws.send("CLOSE");
     };
+}
+
+function collectValuesFromCheckboxes() {
+    var favorite = [];
+    $.each($("input[type='checkbox']:checked"), function(){
+        favorite.push($(this).val());
+    });
+
+    console.log(favorite);
+    console.log(JSON.stringify(favorite));
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/getOptionsFromCheckboxes",
+        data: JSON.stringify(favorite),
+        dataType: 'text',
+        timeout: 100000,
+        success: function (data) {
+            $("#submitTests").disable();
+        },
+        error: function (e) {
+            console.log("ERROR_FILTER: ", e);
+        },
+        done: function (e) {
+            //console.log("DONE");
+        }
+    });
 }

@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import service.old.UtilsSsh;
+import util.UtilsSsh;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 
