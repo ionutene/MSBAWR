@@ -1,5 +1,7 @@
 package util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -7,6 +9,8 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.*;
 
 public class RuntimeProcessesUtil {
+
+    private static final Logger LOGGER = LogManager.getLogger(RuntimeProcessesUtil.class);
 
     public static Process getProcessFromBuilder(String osCMDPath, String osCMDOption,
                                                 String commandToExecute) throws IOException {
@@ -37,6 +41,7 @@ public class RuntimeProcessesUtil {
         BufferedReader r = new BufferedReader(new InputStreamReader(stream));
         String line;
         while (((line = r.readLine()) != null)) {
+            LOGGER.debug(line);
             messagingTemplate.convertAndSend(destination, line + "<br/>");
         }
     }

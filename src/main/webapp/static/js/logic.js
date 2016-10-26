@@ -60,7 +60,14 @@ $(document).ready(function () {
     
     $("#submitTests").click(function (e) {
         e.preventDefault();
+        $("#section").empty();
         collectValuesFromCheckboxes();
+    });
+
+    $("#cancelTests").click(function (e) {
+        e.preventDefault();
+        $("#section").empty();
+        stopRunningTests();
     });
 
 //  RESET if someone changes the Environment
@@ -266,7 +273,7 @@ function collectValuesFromCheckboxes() {
         favorite.push($(this).val());
     });
 
-    console.log(favorite);
+    // console.log(favorite);
     console.log(JSON.stringify(favorite));
 
     $.ajax({
@@ -277,10 +284,35 @@ function collectValuesFromCheckboxes() {
         dataType: 'text',
         timeout: 100000,
         success: function (data) {
-            $("#submitTests").disable();
         },
         error: function (e) {
             console.log("ERROR_FILTER: ", e);
+        },
+        done: function (e) {
+            //console.log("DONE");
+        }
+    });
+}
+
+function stopRunningTests() {
+    var options = {};
+    options["env"] = $('#select_envs').find('option:selected').html();
+    options["type"] = $("#select_type").val();
+    options["filter"] = $("#select_filter").val();
+
+    console.log(JSON.stringify(options));
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/stopTestsOnEnv",
+        data: JSON.stringify(options),
+        dataType: 'json',
+        timeout: 100000,
+        success: function (data) {
+        },
+        error: function (e) {
+            console.log("ERROR: ", e);
         },
         done: function (e) {
             //console.log("DONE");
