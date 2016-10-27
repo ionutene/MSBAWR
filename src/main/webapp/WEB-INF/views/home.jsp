@@ -6,7 +6,6 @@
 <c:url value="/static/pages/howtorun.html" var="staticHowTo"/>
 <c:url value="/static/pages/results.html" var="staticResults"/>
 <c:url value="/static/pages/checkboxesView.html" var="checkboxesView"/>
-<c:url value="/zipper" var="zipper"/>
 <c:url value="/static/css/style.css" var="staticCSS"/>
 <c:url value="/static/js/jquery-3.0.0.min.js" var="staticJQuery"/>
 <c:url value="/static/js/logic.js" var="staticJS"/>
@@ -48,7 +47,7 @@
     <a href="${checkboxesView}" id="aLink3">Checkboxes</a><br>
 
     <form action="">
-        <input type="image" id="reindex" src="${reloadIMG}" alt="Submit"/>
+        <input type="submit" id="reindex" value="ReIndex"/>
         <input type="submit" id="submitTests" value="Run" hidden>
         <input type="submit" id="cancelTests" value="Stop" hidden>
     </form>

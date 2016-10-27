@@ -13,9 +13,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
-public class RunTestsService {
+public class PrepareForTestsService {
 
-    private static final Logger LOGGER = LogManager.getLogger(RunTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(PrepareForTestsService.class);
 
     @Value("${os.cmd.path}")
     private String osCMDPath;
@@ -29,24 +29,14 @@ public class RunTestsService {
     @Value("${regressionFrameworkLocationCMD}")
     private String regressionFrameworkLocationCMD;
 
-    public String prepareArguments(List<String> values) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String value : values) {
-            stringBuilder.append(value).append(" ");
-        }
-        return stringBuilder.toString();
-    }
-
-    public void runTestsForEnvironmentWithArgs(String environment, String args, String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
+    public void getMachinesVersion(String environment, String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
         List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
 
-//      TODO remove CTA test hardcoding
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " cta";
+        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + environment + " version";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
     }
-
 }

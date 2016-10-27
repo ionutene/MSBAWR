@@ -10,8 +10,10 @@ public class FilesAndDirectoryUtil {
 
     public static List<Path> findFilesInPathWithPattern(String pathToSearch, String pattern) throws IOException {
         List<Path> filesFound = new ArrayList<>();
-        try (DirectoryStream<Path> ds = Files.newDirectoryStream(Paths.get(pathToSearch), pattern)) {
-            for (Path file : ds) {
+        try (DirectoryStream<Path> directoryStream =
+                     Files.newDirectoryStream(FileSystems.getDefault().getPath(pathToSearch), pattern)) {
+            for (Path file : directoryStream) {
+//                LOGGER.info(file.getFileName());
                 filesFound.add(file);
             }
         }
@@ -19,7 +21,7 @@ public class FilesAndDirectoryUtil {
     }
 
     public static boolean findFileInPath(String fileToFind, String pathToSearch) throws IOException {
-        try (DirectoryStream<Path> ds = Files.newDirectoryStream(Paths.get(pathToSearch))) {
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(pathToSearch))) {
             for (Path file : ds) {
 //                LOGGER.info(file.getFileName());
                 if (fileToFind.equals(file.getFileName().toString()))
@@ -30,7 +32,7 @@ public class FilesAndDirectoryUtil {
     }
 
     public static void deleteDirectory(String directoryPath) throws IOException {
-        Files.walkFileTree(Paths.get(directoryPath), new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(FileSystems.getDefault().getPath(directoryPath), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Files.delete(file);

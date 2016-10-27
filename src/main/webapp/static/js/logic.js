@@ -66,7 +66,8 @@ $(document).ready(function () {
 
     $("#cancelTests").click(function (e) {
         e.preventDefault();
-        $("#section").empty();
+        // There's no need to erase, just append!
+        // $("#section").empty();
         stopRunningTests();
     });
 
@@ -81,6 +82,8 @@ $(document).ready(function () {
         $("#checkers").empty();
         $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
         $("#checkers").show();
+
+        prepareForTests();
     });
 
 //  If someone changes the Type of test some action must be taken
@@ -152,10 +155,9 @@ function appendOptionsFromJSON(json, idName) {
 }
 
 function getFilterOptions() {
-    var options = {};
-    options["env"] = $('#select_envs').find('option:selected').html();
-    options["type"] = $("#select_type").val();
-    //console.log(options);
+    var options = gatherOptions();
+
+    console.log(JSON.stringify(options));
 
     $.ajax({
         type: "POST",
@@ -193,11 +195,9 @@ function getFilterOptions() {
 }
 
 function getCheckboxes() {
-    var options = {};
-    options["env"] = $('#select_envs').find('option:selected').html();
-    options["type"] = $("#select_type").val();
-    options["filter"] = $("#select_filter").val();
-    //console.log(options);
+    var options = gatherOptions();
+
+    console.log(JSON.stringify(options));
 
     $.ajax({
         type: "POST",
@@ -221,66 +221,23 @@ function getCheckboxes() {
     });
 }
 
-function doReindex() {
-    $.ajax({
-        type: "GET",
-        contentType: "text/plain",
-        url: "/getZip",
-        dataType: 'text',
-        timeout: 100000,
-        async: false,
-        success: function (data) {
-            $("#section").empty();
-            console.log(data);
-            $("#section").html(data);
-            /*$.each(data, function (key) {
-             $("#section").append(key);
-             });*/
-            $("#reindex").prop("disabled", false);
-            console.log("And we're out of here!");
-        },
-        error: function (e) {
-            console.log("ERROR_FILTER: ", e);
-        },
-        done: function (e) {
-            //console.log("DONE");
-        }
-    });
-}
-
-function webSockety() {
-    // Write your code in the same way as for native WebSocket:
-    var ws = new WebSocket("ws://localhost:8080/WebSockety");
-    ws.onopen = function () {
-        ws.send("GET_ZIP");  // Sends a message.
-    };
-    ws.onmessage = function (e) {
-        // Receives a message.
-        console.log(e.data);
-    };
-    ws.onerror = function (e) {
-        console.log(e);
-    };
-    ws.onclose = function () {
-        console.log("closed");
-        ws.send("CLOSE");
-    };
-}
-
 function collectValuesFromCheckboxes() {
     var favorite = [];
     $.each($("input[type='checkbox']:checked"), function(){
         favorite.push($(this).val());
     });
+    var composite = {};
+    composite["environment"] = $('#select_envs').find('option:selected').html();
+    composite["checkBoxes"] = favorite;
 
-    // console.log(favorite);
     console.log(JSON.stringify(favorite));
+    console.log(JSON.stringify(composite));
 
     $.ajax({
         type: "POST",
         contentType: "application/json",
         url: "/getOptionsFromCheckboxes",
-        data: JSON.stringify(favorite),
+        data: JSON.stringify(composite),
         dataType: 'text',
         timeout: 100000,
         success: function (data) {
@@ -295,10 +252,7 @@ function collectValuesFromCheckboxes() {
 }
 
 function stopRunningTests() {
-    var options = {};
-    options["env"] = $('#select_envs').find('option:selected').html();
-    options["type"] = $("#select_type").val();
-    options["filter"] = $("#select_filter").val();
+    var options = gatherOptions();
 
     console.log(JSON.stringify(options));
 
@@ -318,4 +272,35 @@ function stopRunningTests() {
             //console.log("DONE");
         }
     });
+}
+
+function prepareForTests() {
+    var options = gatherOptions();
+
+    console.log(JSON.stringify(options));
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/prepareForTestsOnEnv",
+        data: JSON.stringify(options),
+        dataType: 'json',
+        timeout: 100000,
+        success: function (data) {
+        },
+        error: function (e) {
+            console.log("ERROR: ", e);
+        },
+        done: function (e) {
+            //console.log("DONE");
+        }
+    });
+}
+
+function gatherOptions() {
+    var options = {};
+    options["env"] = $('#select_envs').find('option:selected').html();
+    options["type"] = $("#select_type").val();
+    options["filter"] = $("#select_filter").val();
+    return options;
 }

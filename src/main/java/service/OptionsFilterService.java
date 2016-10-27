@@ -1,7 +1,7 @@
 package service;
 
+import data.AdvancedSearchCriteria;
 import data.EnvironmentsCapsule;
-import data.SearchCriteria;
 import data.request.WebTestsJSONData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +35,7 @@ public class OptionsFilterService{
 
     private EnvironmentsCapsule capsule;
     private WebTestsJSONData tests;
-    private SearchCriteria selectedOptions;
+    private AdvancedSearchCriteria advancedSearchCriteria;
 
     @Autowired
     public OptionsFilterService(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
@@ -43,8 +43,8 @@ public class OptionsFilterService{
         this.tests = tests;
     }
 
-    public void setSelectedOptions(SearchCriteria selectedOptions) {
-        this.selectedOptions = selectedOptions;
+    public void setSelectedOptions(AdvancedSearchCriteria advancedSearchCriteria) {
+        this.advancedSearchCriteria = advancedSearchCriteria;
     }
 
     public Map<String, String> getJSONOptionsFilter() {
@@ -52,8 +52,8 @@ public class OptionsFilterService{
         Map<String, String> environmentSelect = capsule.getEnvironment();
 //      LinkedHashMap to preserve insertion order!!!
         Map<String, String> response = new LinkedHashMap<>();
-        String environment = selectedOptions.getEnv();
-        String testType = selectedOptions.getType();
+        String environment = advancedSearchCriteria.getEnv();
+        String testType = advancedSearchCriteria.getType();
         List<String> environmentTests = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : environmentSelect.entrySet()) {

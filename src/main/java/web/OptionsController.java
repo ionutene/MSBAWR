@@ -1,6 +1,6 @@
 package web;
 
-import data.SearchCriteria;
+import data.AdvancedSearchCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +20,9 @@ public class OptionsController {
     OptionsFilterService optionsFilterService;
 
     @RequestMapping(value = "/getOptions")
-    public Map<String, String> getSearchResultViaAjax(@RequestBody SearchCriteria search) {
-        LOGGER.info(search);
-        optionsFilterService.setSelectedOptions(search);
+    public Map<String, String> getSearchResultViaAjax(@RequestBody AdvancedSearchCriteria advancedSearchCriteria) {
+        LOGGER.info(advancedSearchCriteria);
+        optionsFilterService.setSelectedOptions(advancedSearchCriteria);
         return optionsFilterService.getJSONOptionsFilter();
     }
 

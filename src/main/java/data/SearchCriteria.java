@@ -1,30 +1,32 @@
 package data;
 
+import java.util.List;
+
 public class SearchCriteria {
-    String env;
-    String type;
+    String environment;
+    List<String> checkBoxes;
 
-    public String getEnv() {
-        return env;
+    public String getEnvironment() {
+        return environment;
     }
 
-    public void setEnv(String env) {
-        this.env = env;
+    public void setEnvironment(String environment) {
+        this.environment = environment;
     }
 
-    public String getType() {
-        return type;
+    public List<String> getCheckBoxes() {
+        return checkBoxes;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCheckBoxes(List<String> checkBoxes) {
+        this.checkBoxes = checkBoxes;
     }
 
     @Override
     public String toString() {
         return "SearchCriteria{" +
-                "env='" + env + '\'' +
-                ", type='" + type + '\'' +
+                "environment='" + environment + '\'' +
+                ", checkBoxes=" + checkBoxes +
                 '}';
     }
 }
