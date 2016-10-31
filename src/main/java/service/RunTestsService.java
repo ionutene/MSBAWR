@@ -2,12 +2,16 @@ package service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -29,15 +33,25 @@ public class RunTestsService {
     @Value("${regressionFrameworkLocationCMD}")
     private String regressionFrameworkLocationCMD;
 
-    public String prepareArguments(List<String> values) {
+    private String processedArguments;
+    private String environment;
+
+    @Autowired
+    AfterTestsService afterTestsService;
+
+    public void setArguments(List<String> values) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String value : values) {
             stringBuilder.append(value).append(" ");
         }
-        return stringBuilder.toString();
+        this.processedArguments = stringBuilder.toString();
     }
 
-    public void runTestsForEnvironmentWithArgs(String environment, String args, String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
+    public void setEnvironment(String environment) {
+        this.environment = environment;
+    }
+
+    public void runTestsForEnvironmentWithArgs(String destination, SimpMessagingTemplate messagingTemplate) throws IOException, ParserConfigurationException, SAXException, TransformerException {
         List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
@@ -47,6 +61,11 @@ public class RunTestsService {
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
+        while (p.isAlive()) {/* wait until process finishes */}
+        afterTestsService.setEnvironment(environment);
+        afterTestsService.moveTestsOutputToResults();
+        afterTestsService.updateResultsXML();
+        afterTestsService.deleteRecentTestsLogFile();
     }
 
 }

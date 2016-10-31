@@ -45,4 +45,15 @@ public class RuntimeProcessesUtil {
             messagingTemplate.convertAndSend(destination, line + "<br/>");
         }
     }
+
+    public static String getMSBAdapterVersionFromInputStream(InputStream stream) throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
+        String line;
+        StringBuilder stringBuilder = new StringBuilder();
+        while (((line = r.readLine()) != null)) {
+            LOGGER.debug(line);
+            stringBuilder.append(line);
+        }
+        return stringBuilder.toString();
+    }
 }

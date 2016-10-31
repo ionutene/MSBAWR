@@ -34,9 +34,13 @@ public class PrepareForTestsService {
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
 
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + environment + " version";
+        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " version";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
+    }
+
+    public void zipResults(String environment, String destination, SimpMessagingTemplate messagingTemplate) {
+
     }
 }

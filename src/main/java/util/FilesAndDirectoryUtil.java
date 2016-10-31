@@ -50,5 +50,15 @@ public class FilesAndDirectoryUtil {
     public static void createDirectory(String directoryPath) throws IOException {
         Files.createDirectory(FileSystems.getDefault().getPath(directoryPath));
     }
-    
+
+    public static void moveDirectory(Path sourceDirectory, Path targetDirectory) throws IOException {
+        Files.move(sourceDirectory, targetDirectory, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public static void moveDirectory(String sourceDirectory, String targetDirectory) throws IOException {
+        Files.move(FileSystems.getDefault().getPath(sourceDirectory),
+                FileSystems.getDefault().getPath(targetDirectory),
+                StandardCopyOption.REPLACE_EXISTING);
+    }
+
 }

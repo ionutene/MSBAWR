@@ -28,5 +28,6 @@ public class PrepareForTestsController {
     public void prepareForTests(@RequestBody AdvancedSearchCriteria advancedSearchCriteria) throws IOException {
         LOGGER.info(advancedSearchCriteria);
         prepareForTestsService.getMachinesVersion(advancedSearchCriteria.getEnv(), "/topic/message", template);
+        prepareForTestsService.zipResults(advancedSearchCriteria.getEnv(), "/topic/message", template);
     }
 }

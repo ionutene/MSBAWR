@@ -261,7 +261,7 @@ function stopRunningTests() {
         contentType: "application/json",
         url: "/stopTestsOnEnv",
         data: JSON.stringify(options),
-        dataType: 'json',
+        dataType: 'text',
         timeout: 100000,
         success: function (data) {
         },
@@ -284,7 +284,7 @@ function prepareForTests() {
         contentType: "application/json",
         url: "/prepareForTestsOnEnv",
         data: JSON.stringify(options),
-        dataType: 'json',
+        dataType: 'text',
         timeout: 100000,
         success: function (data) {
         },
