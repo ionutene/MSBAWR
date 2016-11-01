@@ -10,9 +10,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.xml.sax.SAXException;
-import service.ReindexTestsService;
-import service.RunTestsService;
-import service.StopTestsService;
+import service.impl.ReindexTestsService;
+import service.impl.RunTestsService;
+import service.impl.StopTestsService;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
