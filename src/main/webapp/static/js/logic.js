@@ -55,21 +55,21 @@ $(document).ready(function () {
     $("#reindex").click(function (e) {
         e.preventDefault();
         $("#section").empty();
-        stompClient.send('/app/section', {}, "reindex");
+        stompClient.send('/app/reindex', {}, "reindex");
     });
     
     $("#submitTests").click(function (e) {
         e.preventDefault();
         $("#section").empty();
-        var headers = {'content-type': 'application/json'};
+        // var headers = {'content-type': 'application/json'};
         stompClient.send('/app/runTests', {}, JSON.stringify(collectValuesFromCheckboxes()));
-        // collectValuesFromCheckboxes();
     });
 
     $("#cancelTests").click(function (e) {
         e.preventDefault();
         // There's no need to erase, just append!
         // $("#section").empty();
+        stompClient.send('/app/stopTests', {}, JSON.stringify(gatherOptions()));
         stopRunningTests();
     });
 
@@ -159,8 +159,6 @@ function appendOptionsFromJSON(json, idName) {
 function getFilterOptions() {
     var options = gatherOptions();
 
-    console.log(JSON.stringify(options));
-
     $.ajax({
         type: "POST",
         contentType: "application/json",
@@ -199,8 +197,6 @@ function getFilterOptions() {
 function getCheckboxes() {
     var options = gatherOptions();
 
-    console.log(JSON.stringify(options));
-
     $.ajax({
         type: "POST",
         contentType: "application/json",
@@ -223,65 +219,8 @@ function getCheckboxes() {
     });
 }
 
-function collectValuesFromCheckboxes() {
-    var favorite = [];
-    $.each($("input[type='checkbox']:checked"), function(){
-        favorite.push($(this).val());
-    });
-    var composite = {};
-    composite["environment"] = $('#select_envs').find('option:selected').html();
-    composite["checkBoxes"] = favorite;
-
-    console.log(JSON.stringify(favorite));
-    console.log(JSON.stringify(composite));
-
-    return composite;
-
-    /*$.ajax({
-        type: "POST",
-        contentType: "application/json",
-        url: "/getOptionsFromCheckboxes",
-        data: JSON.stringify(composite),
-        dataType: 'text',
-        timeout: 100000,
-        success: function (data) {
-        },
-        error: function (e) {
-            console.log("ERROR_FILTER: ", e);
-        },
-        done: function (e) {
-            //console.log("DONE");
-        }
-    });*/
-}
-
-function stopRunningTests() {
-    var options = gatherOptions();
-
-    console.log(JSON.stringify(options));
-
-    $.ajax({
-        type: "POST",
-        contentType: "application/json",
-        url: "/stopTestsOnEnv",
-        data: JSON.stringify(options),
-        dataType: 'text',
-        timeout: 100000,
-        success: function (data) {
-        },
-        error: function (e) {
-            console.log("ERROR: ", e);
-        },
-        done: function (e) {
-            //console.log("DONE");
-        }
-    });
-}
-
 function prepareForTests() {
     var options = gatherOptions();
-
-    console.log(JSON.stringify(options));
 
     $.ajax({
         type: "POST",
@@ -306,5 +245,21 @@ function gatherOptions() {
     options["env"] = $('#select_envs').find('option:selected').html();
     options["type"] = $("#select_type").val();
     options["filter"] = $("#select_filter").val();
+    // console.log(JSON.stringify(options));
     return options;
+}
+
+function collectValuesFromCheckboxes() {
+    var favorite = [];
+    $.each($("input[type='checkbox']:checked"), function(){
+        favorite.push($(this).val());
+    });
+    var composite = {};
+    composite["environment"] = $('#select_envs').find('option:selected').html();
+    composite["checkBoxes"] = favorite;
+
+    // console.log(JSON.stringify(favorite));
+    // console.log(JSON.stringify(composite));
+
+    return composite;
 }

@@ -1,6 +1,7 @@
 package web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import data.AdvancedSearchCriteria;
 import data.SearchCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,8 +10,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.xml.sax.SAXException;
+import service.ReindexTestsService;
 import service.RunTestsService;
-import service.WebSocketReindexTestsService;
+import service.StopTestsService;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -22,18 +24,20 @@ public class WebSocketController {
     private static final Logger LOGGER = LogManager.getLogger(WebSocketController.class);
 
     @Autowired
-    WebSocketReindexTestsService webSocketReindexTestsService;
-
-    @Autowired
-    private SimpMessagingTemplate template;
+    ReindexTestsService reindexTestsService;
 
     @Autowired
     private RunTestsService runTestsService;
 
-    @MessageMapping("/section")
-    public void result(String message) throws Exception {
-        if (message != null && message.equals("reindex"))
-            webSocketReindexTestsService.webSocketReindexTests("/topic/message", template);
+    @Autowired
+    StopTestsService stopTestsService;
+
+    @Autowired
+    private SimpMessagingTemplate template;
+
+    @MessageMapping("/reindex")
+    public void reindex(String message) throws Exception {
+        reindexTestsService.getLatestRegressionFrameworkJar("/topic/message", template);
     }
 
     @MessageMapping("/runTests")
@@ -45,6 +49,14 @@ public class WebSocketController {
         runTestsService.setEnvironment(searchCriteria.getEnvironment());
         runTestsService.setArguments(searchCriteria.getCheckBoxes());
         runTestsService.runTestsForEnvironmentWithArgs("/topic/message", template);
+    }
+
+    @MessageMapping("/stopTests")
+    public void stopTests(String message) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
+        LOGGER.info(advancedSearchCriteria);
+        stopTestsService.stopRunningTestsOnEnvironment(advancedSearchCriteria.getEnv(), "/topic/message", template);
     }
 
 }

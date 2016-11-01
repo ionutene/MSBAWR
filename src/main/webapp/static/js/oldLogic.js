@@ -43,3 +43,42 @@ function webSockety() {
         ws.send("CLOSE");
     };
 }
+
+
+/*$.ajax({
+ type: "POST",
+ contentType: "application/json",
+ url: "/getOptionsFromCheckboxes",
+ data: JSON.stringify(composite),
+ dataType: 'text',
+ timeout: 100000,
+ success: function (data) {
+ },
+ error: function (e) {
+ console.log("ERROR_FILTER: ", e);
+ },
+ done: function (e) {
+ //console.log("DONE");
+ }
+ });*/
+
+function stopRunningTests() {
+    var options = gatherOptions();
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/stopTestsOnEnv",
+        data: JSON.stringify(options),
+        dataType: 'text',
+        timeout: 100000,
+        success: function (data) {
+        },
+        error: function (e) {
+            console.log("ERROR: ", e);
+        },
+        done: function (e) {
+            //console.log("DONE");
+        }
+    });
+}

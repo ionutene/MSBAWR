@@ -17,9 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class WebSocketReindexTestsService {
+public class ReindexTestsService {
 
-    private static final Logger LOGGER = LogManager.getLogger(WebSocketReindexTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(ReindexTestsService.class);
 
     @Value("${jenkins.host}")
     private String jenkinsHost;
@@ -48,9 +48,10 @@ public class WebSocketReindexTestsService {
     private String osCMDOption;
 
     //    @Autowired
+//  TODO Check if further versions of SpringWebSockets work with PROXY_CLASSES
     private Session jenkinsSession;
 
-    public void webSocketReindexTests(String destination, SimpMessagingTemplate payload) throws Exception {
+    public void getLatestRegressionFrameworkJar(String destination, SimpMessagingTemplate payload) throws Exception {
         try {
 
             jenkinsSession = initSSHAuth();
