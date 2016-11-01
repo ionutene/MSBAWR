@@ -17,9 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class ReindexTestsService {
+public class ReindexTestsServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(ReindexTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(ReindexTestsServiceImpl.class);
 
     @Value("${jenkins.host}")
     private String jenkinsHost;

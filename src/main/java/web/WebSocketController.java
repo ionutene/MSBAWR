@@ -10,9 +10,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.xml.sax.SAXException;
-import service.impl.ReindexTestsService;
-import service.impl.RunTestsService;
-import service.impl.StopTestsService;
+import service.impl.ReindexTestsServiceImpl;
+import service.impl.RunTestsServiceImpl;
+import service.impl.StopTestsServiceImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -24,13 +24,13 @@ public class WebSocketController {
     private static final Logger LOGGER = LogManager.getLogger(WebSocketController.class);
 
     @Autowired
-    ReindexTestsService reindexTestsService;
+    ReindexTestsServiceImpl reindexTestsService;
 
     @Autowired
-    private RunTestsService runTestsService;
+    private RunTestsServiceImpl runTestsService;
 
     @Autowired
-    StopTestsService stopTestsService;
+    StopTestsServiceImpl stopTestsService;
 
     @Autowired
     private SimpMessagingTemplate template;

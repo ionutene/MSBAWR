@@ -5,17 +5,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
 
 @Service
-public class PrepareForTestsService {
+public class StopTestsServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(PrepareForTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(StopTestsServiceImpl.class);
 
     @Value("${os.cmd.path}")
     private String osCMDPath;
@@ -29,18 +26,10 @@ public class PrepareForTestsService {
     @Value("${regressionFrameworkLocationCMD}")
     private String regressionFrameworkLocationCMD;
 
-    public void getMachinesVersion(String environment, String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
-        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
-
-        if (paths.size() != 1) throw new IOException("Too many .jar files!");
-
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " version";
+    public void stopRunningTestsOnEnvironment(String environment, String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
+        String commandToExecute = "for /f \"tokens=1\" %i in ('jps -m ^| find \"" + environment + "\"') do ( taskkill /F /PID %i )";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
-    }
-
-    public void zipResults(String environment, String destination, SimpMessagingTemplate messagingTemplate) {
-
     }
 }

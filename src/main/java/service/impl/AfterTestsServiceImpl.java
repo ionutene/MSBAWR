@@ -28,9 +28,9 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class AfterTestsService {
+public class AfterTestsServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(AfterTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(AfterTestsServiceImpl.class);
 
     @Value("${os.cmd.path}")
     private String osCMDPath;

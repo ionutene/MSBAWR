@@ -15,9 +15,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CheckboxesTreeViewService {
+public class CheckboxesTreeViewServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(CheckboxesTreeViewService.class);
+    private static final Logger LOGGER = LogManager.getLogger(CheckboxesTreeViewServiceImpl.class);
 
     @Value("${package.prefix}")
     String prefix;
@@ -45,7 +45,7 @@ public class CheckboxesTreeViewService {
     private String htmlCheckboxFin = "</label>";
 
     @Autowired
-    public CheckboxesTreeViewService(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
+    public CheckboxesTreeViewServiceImpl(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
         this.capsule = capsule;
         this.tests = tests;
     }

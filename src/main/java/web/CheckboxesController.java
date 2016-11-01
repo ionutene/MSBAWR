@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import service.impl.CheckboxesTreeViewService;
-import service.impl.CheckboxesViewService;
+import service.impl.CheckboxesTreeViewServiceImpl;
+import service.impl.CheckboxesViewServiceImpl;
 
 @RestController
 public class CheckboxesController {
@@ -18,10 +18,10 @@ public class CheckboxesController {
     private static final Logger LOGGER = LogManager.getLogger(CheckboxesController.class);
 
     @Autowired
-    CheckboxesViewService checkboxesViewService;
+    CheckboxesViewServiceImpl checkboxesViewService;
 
     @Autowired
-    CheckboxesTreeViewService checkboxesTreeViewService;
+    CheckboxesTreeViewServiceImpl checkboxesTreeViewService;
 
     @RequestMapping(value = "/getCheckboxes", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getCheckboxesViaAjax(@RequestBody AdvancedSearchCriteria search) {

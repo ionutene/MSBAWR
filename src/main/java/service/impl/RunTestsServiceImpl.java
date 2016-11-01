@@ -17,9 +17,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
-public class RunTestsService {
+public class RunTestsServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(RunTestsService.class);
+    private static final Logger LOGGER = LogManager.getLogger(RunTestsServiceImpl.class);
 
     @Value("${os.cmd.path}")
     private String osCMDPath;
@@ -37,7 +37,7 @@ public class RunTestsService {
     private String environment;
 
     @Autowired
-    AfterTestsService afterTestsService;
+    AfterTestsServiceImpl afterTestsService;
 
     public void setArguments(List<String> values) {
         StringBuilder stringBuilder = new StringBuilder();

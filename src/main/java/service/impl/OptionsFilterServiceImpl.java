@@ -13,9 +13,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class OptionsFilterService{
+public class OptionsFilterServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(OptionsFilterService.class);
+    private static final Logger LOGGER = LogManager.getLogger(OptionsFilterServiceImpl.class);
 
     @Value("${package.prefix}")
     String prefix;
@@ -38,7 +38,7 @@ public class OptionsFilterService{
     private AdvancedSearchCriteria advancedSearchCriteria;
 
     @Autowired
-    public OptionsFilterService(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
+    public OptionsFilterServiceImpl(EnvironmentsCapsule capsule, WebTestsJSONData tests) {
         this.capsule = capsule;
         this.tests = tests;
     }
