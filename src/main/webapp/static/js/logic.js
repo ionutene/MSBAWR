@@ -39,7 +39,6 @@ $(document).ready(function () {
     stompClient.connect({}, stompConnectCallback, stompErrorCallback);
 
 
-
     $("a").click(function (e) {
         e.preventDefault();
         var addressValue = $(this).attr("href");
@@ -57,7 +56,7 @@ $(document).ready(function () {
         $("#section").empty();
         stompClient.send('/app/reindex', {}, "reindex");
     });
-    
+
     $("#submitTests").click(function (e) {
         e.preventDefault();
         $("#section").empty();
@@ -251,7 +250,7 @@ function gatherOptions() {
 
 function collectValuesFromCheckboxes() {
     var favorite = [];
-    $.each($("input[type='checkbox']:checked"), function(){
+    $.each($("input[type='checkbox']:checked"), function () {
         favorite.push($(this).val());
     });
     var composite = {};
@@ -262,4 +261,45 @@ function collectValuesFromCheckboxes() {
     // console.log(JSON.stringify(composite));
 
     return composite;
+}
+
+function printResults(xml) {
+    console.log("A intrat pe aicisea!");
+    var xmlDoc = $.parseXML(xml);
+
+    var $xml = $(xmlDoc);
+
+    var $result = $xml.find("Result");
+
+    $result.each(function () {
+
+        var date = $(this).find('Date').text(),
+            name = $(this).find('Name').text(),
+            log = $(this).find('Log').text(),
+            mas = $(this).find('Mas').text(),
+            mpos = $(this).find('Mpos').text();
+
+        if (mas == undefined) {
+            mas = '-';
+        } else {
+            mas = mas.nodeValue;
+        }
+
+        if (mpos == undefined) {
+            mpos = '-';
+        } else {
+            mpos = mpos.nodeValue;
+        }
+
+        var columnDate = "<td>" + date + "</td>",
+            columnTestNG = "<td><a href='results/" + name + "/index.html'>" + name + "</a></td>",
+            columnLog = "<td><a href='results/" + name + "/" + log + "'>" + log + "</a></td>",
+            columnMASVersion = "<td>" + mas + "</td>",
+            columnMPOSVersion = "<td>" + mpos + "</td>";
+
+        var tableRow = "<tr>" + columnDate + columnTestNG + columnLog + columnMASVersion + columnMPOSVersion + "</tr>";
+
+        $('#myTable tr:last').after(tableRow);
+
+    });
 }
