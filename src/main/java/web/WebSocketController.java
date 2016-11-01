@@ -24,13 +24,13 @@ public class WebSocketController {
     private static final Logger LOGGER = LogManager.getLogger(WebSocketController.class);
 
     @Autowired
-    ReindexTestsService reindexTestsService;
+    private ReindexTestsService reindexTestsService;
 
     @Autowired
     private RunTestsService runTestsService;
 
     @Autowired
-    StopTestsService stopTestsService;
+    private StopTestsService stopTestsService;
 
     @Autowired
     private SimpMessagingTemplate template;

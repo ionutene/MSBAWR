@@ -8,12 +8,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import service.CheckboxesViewService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CheckboxesViewServiceImpl {
+public class CheckboxesViewServiceImpl implements CheckboxesViewService {
 
     private static final Logger LOGGER = LogManager.getLogger(CheckboxesViewServiceImpl.class);
 

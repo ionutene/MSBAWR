@@ -8,12 +8,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import service.OptionsFilterService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class OptionsFilterServiceImpl {
+public class OptionsFilterServiceImpl implements OptionsFilterService {
 
     private static final Logger LOGGER = LogManager.getLogger(OptionsFilterServiceImpl.class);
 

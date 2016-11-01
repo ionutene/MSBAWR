@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import service.PrepareForTestsService;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 
@@ -13,7 +14,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
-public class PrepareForTestsServiceImpl {
+public class PrepareForTestsServiceImpl implements PrepareForTestsService {
 
     private static final Logger LOGGER = LogManager.getLogger(PrepareForTestsServiceImpl.class);
 

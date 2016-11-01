@@ -9,7 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import service.impl.PrepareForTestsServiceImpl;
+import service.PrepareForTestsService;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class PrepareForTestsController {
     private static final Logger LOGGER = LogManager.getLogger(PrepareForTestsController.class);
 
     @Autowired
-    PrepareForTestsServiceImpl prepareForTestsService;
+    private PrepareForTestsService prepareForTestsService;
 
     @Autowired
     private SimpMessagingTemplate template;

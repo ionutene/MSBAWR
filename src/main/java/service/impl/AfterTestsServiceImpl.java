@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import service.AfterTestsService;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 
@@ -28,7 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class AfterTestsServiceImpl {
+public class AfterTestsServiceImpl implements AfterTestsService {
 
     private static final Logger LOGGER = LogManager.getLogger(AfterTestsServiceImpl.class);
 
@@ -98,6 +99,7 @@ public class AfterTestsServiceImpl {
     private void saveDocumentToXML(Document document, String resultFilePath) throws TransformerException {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
         //initialize StreamResult with File object to save to file
 
@@ -107,7 +109,7 @@ public class AfterTestsServiceImpl {
         LOGGER.info(Paths.get(resultFilePath).toAbsolutePath().toString() + " a fost modificat!");
     }
 
-    public String getMachinesVersion() throws IOException {
+    private String getMachinesVersion() throws IOException {
         List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");

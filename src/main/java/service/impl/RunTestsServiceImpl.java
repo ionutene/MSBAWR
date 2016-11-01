@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
+import service.AfterTestsService;
 import service.RunTestsService;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
@@ -38,7 +39,7 @@ public class RunTestsServiceImpl implements RunTestsService {
     private String environment;
 
     @Autowired
-    AfterTestsServiceImpl afterTestsService;
+    AfterTestsService afterTestsService;
 
     public void setArguments(List<String> values) {
         StringBuilder stringBuilder = new StringBuilder();
