@@ -1,5 +1,8 @@
 package util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -7,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FilesAndDirectoryUtil {
+
+    private static final Logger LOGGER = LogManager.getLogger(FilesAndDirectoryUtil.class);
 
     public static List<Path> findFilesInPathWithPattern(String pathToSearch, String pattern) throws IOException {
         List<Path> filesFound = new ArrayList<>();

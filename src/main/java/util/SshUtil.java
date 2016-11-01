@@ -1,22 +1,19 @@
 package util;
 
 import com.jcraft.jsch.*;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
+import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 
-public class UtilsSsh {
+public class SshUtil {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(UtilsSsh.class);
-
-    public static HashMap<String, String > hMap = new HashMap<String, String >();
+    private static final Logger LOGGER = LogManager.getLogger(SshUtil.class);
 
     public static Session initSSHAuth(String host, String port, String userName, String password) throws JSchException {
         Session sshCon;
@@ -31,8 +28,51 @@ public class UtilsSsh {
         return sshCon;
     }
 
+    private static ChannelExec getChannelExec(String command, Session sshConn) throws JSchException {
+        ChannelExec channel = (ChannelExec) sshConn.openChannel("exec");
+        channel.setCommand(command);
+        channel.connect();
+        return channel;
+    }
 
-    public static String executeCommand(String command, Session sshConn, boolean displayCommandResult) {
+    private static String executeCommand(ChannelExec channel, String command, boolean displayCommandResult) throws JSchException {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try(BufferedReader inputBufferedReader = new BufferedReader(new InputStreamReader(channel.getInputStream()));
+            BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(channel.getErrStream()))) {
+
+            String line;
+            String lineError = null;
+            while (((line = inputBufferedReader.readLine()) != null) || (lineError = errorBufferedReader.readLine()) != null) {
+                if (lineError != null) {
+                    LOGGER.warn("Executing command: <" + command + "> with error:" + lineError);
+                    stringBuilder = new StringBuilder();
+                    stringBuilder.append(lineError);
+                    break;
+                }
+                if (displayCommandResult) {
+                    LOGGER.info("Command Result: " + line);
+                }
+                stringBuilder.append(line).append("\n");
+            }
+
+            if (stringBuilder.length() > 0) {
+//              Delete last \n appended
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            }
+
+        } catch (IOException e) {
+            LOGGER.error("Error during <executeCommand>:" + e);
+            stringBuilder = new StringBuilder();
+            stringBuilder.append(e.getMessage());
+        } finally {
+            channel.disconnect();
+        }
+
+        return stringBuilder.toString();
+    }
+
+    /*public static String executeCommand(String command, Session sshConn, boolean displayCommandResult) {
         StringBuilder stringBuilder = new StringBuilder();
         InputStreamReader isr = null;
         BufferedReader in = null;
@@ -98,7 +138,7 @@ public class UtilsSsh {
 
         return stringBuilder.toString();
     }
-
+*/
     public static boolean CopySftpFileToFile(String sourceFile, Session sourceFileSession, String targetFile) throws Exception {
 
         ChannelSftp channelSourceSftp = (ChannelSftp) sourceFileSession.openChannel("sftp");
@@ -116,36 +156,10 @@ public class UtilsSsh {
         return true;
     }
 
-
-    public static boolean CopySftpFileToSftpFile(String sourceFile, Session sourceFileSession, String targetFile, Session targetFileSession) throws Exception {
-
-        ChannelSftp channelSourceSftp = (ChannelSftp) sourceFileSession.openChannel("sftp");
-        channelSourceSftp.connect();
-
-        ChannelSftp channelTargetSftp = (ChannelSftp) targetFileSession.openChannel("sftp");
-        channelTargetSftp.connect();
-
-        InputStream is = channelSourceSftp.get(sourceFile);
-        channelTargetSftp.put(is, targetFile);
-        is.close();
-        channelTargetSftp.chgrp(777, targetFile);
-        channelSourceSftp.disconnect();
-        channelTargetSftp.disconnect();
-
-        String command = "ls " + targetFile.substring(0, targetFile.indexOf("/")) + " | grep " + targetFile.substring(targetFile.indexOf("/") + 1);
-        String fileExist = executeCommand(command, targetFileSession, true);
-
-        if (fileExist.length() == 0) {
-            System.out.println("The file wasn't copied: " + targetFile);
-            return false;
-        }
-        return true;
-    }
-
-
     public static String getInstallerKitPath(String jenkinsAdapterProject, String subFolder, String fileType, Session sshConn) throws Exception {
         String command = "cat \"" + jenkinsAdapterProject + subFolder + "/log\" |grep \"#\"";
-        String buildNumber = executeCommand(command, sshConn, true);
+        ChannelExec channelExec = getChannelExec(command, sshConn);
+        String buildNumber = executeCommand(channelExec, command, true);
 
         if ((buildNumber.length() - buildNumber.replace("#", "").length()) > 1) {
             LOGGER.warn("The build number couldn't be taken from <" + subFolder + ">. It was:" + buildNumber);
@@ -154,7 +168,8 @@ public class UtilsSsh {
 
         buildNumber = buildNumber.substring(buildNumber.indexOf("#") + 1, buildNumber.length());
         command = "find " + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/ -name *" + fileType;
-        String filePath = executeCommand(command, sshConn, true);
+        channelExec = getChannelExec(command, sshConn);
+        String filePath = executeCommand(channelExec, command, true);
 
         if ((filePath.length() - filePath.replace(fileType, "").length()) > fileType.length()) {
             LOGGER.warn("The are more <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
@@ -169,7 +184,8 @@ public class UtilsSsh {
 
     public static String getLatestBuildPath(String jenkinsAdapterProject, String fileType, Session sshConn) throws Exception {
         String command = "find " + jenkinsAdapterProject + "/lastSuccessful/archive/target/ -name *" + fileType;
-        String filePath = executeCommand(command, sshConn, true);
+        ChannelExec channelExec = getChannelExec(command, sshConn);
+        String filePath = executeCommand(channelExec, command, true);
 
         if ((filePath.length() - filePath.replace(fileType, "").length()) > fileType.length()) {
             System.out.println("The are more <" + fileType + "> files in path:" + jenkinsAdapterProject + "/lastSuccessful/archive/target/");
@@ -180,22 +196,6 @@ public class UtilsSsh {
         }
 
         return filePath;
-    }
-
-    public static void setHashMapValues (String xmlPath)throws Exception{
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.parse(new File(xmlPath));
-        doc.getDocumentElement().normalize();
-
-        NodeList nodes = doc.getDocumentElement().getChildNodes();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            if(  !nodes.item(i).getNodeName().equals("#text") ){
-                hMap.put((nodes.item(i).getNodeName()), nodes.item(i).getTextContent());
-            }
-
-        }
     }
 
 }
