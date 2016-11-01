@@ -15,16 +15,12 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @ComponentScan({"web"})
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
-    public static List<Future<String>> JOBS = new ArrayList<>();
 
     private static final StringMessageConverter MESSAGE_CONVERTER;
 
@@ -38,7 +34,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
-        stompEndpointRegistry.addEndpoint("/section").withSockJS();
+        stompEndpointRegistry.addEndpoint("/ws-stomp-stockjs").withSockJS();
     }
 
     @Override

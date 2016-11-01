@@ -24,7 +24,7 @@ $(document).ready(function () {
     $("#checkers").show();
 
     var webSocket,
-        serviceLocation = '/section',
+        serviceLocation = '/ws-stomp-stockjs',
         stompClient = null;
 
     var stompHeader = {
@@ -61,7 +61,9 @@ $(document).ready(function () {
     $("#submitTests").click(function (e) {
         e.preventDefault();
         $("#section").empty();
-        collectValuesFromCheckboxes();
+        var headers = {'content-type': 'application/json'};
+        stompClient.send('/app/runTests', {}, JSON.stringify(collectValuesFromCheckboxes()));
+        // collectValuesFromCheckboxes();
     });
 
     $("#cancelTests").click(function (e) {
@@ -233,7 +235,9 @@ function collectValuesFromCheckboxes() {
     console.log(JSON.stringify(favorite));
     console.log(JSON.stringify(composite));
 
-    $.ajax({
+    return composite;
+
+    /*$.ajax({
         type: "POST",
         contentType: "application/json",
         url: "/getOptionsFromCheckboxes",
@@ -248,7 +252,7 @@ function collectValuesFromCheckboxes() {
         done: function (e) {
             //console.log("DONE");
         }
-    });
+    });*/
 }
 
 function stopRunningTests() {
