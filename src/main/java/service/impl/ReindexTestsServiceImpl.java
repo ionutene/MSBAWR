@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import service.ReindexTestsService;
 import util.UtilsSsh;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
@@ -17,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class ReindexTestsServiceImpl {
+public class ReindexTestsServiceImpl implements ReindexTestsService {
 
     private static final Logger LOGGER = LogManager.getLogger(ReindexTestsServiceImpl.class);
 

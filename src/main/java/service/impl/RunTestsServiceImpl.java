@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
+import service.RunTestsService;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 
@@ -17,7 +18,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
-public class RunTestsServiceImpl {
+public class RunTestsServiceImpl implements RunTestsService {
 
     private static final Logger LOGGER = LogManager.getLogger(RunTestsServiceImpl.class);
 
