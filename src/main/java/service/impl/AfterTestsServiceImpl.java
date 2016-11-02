@@ -2,14 +2,15 @@ package service.impl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import service.AfterTestsService;
+import service.PrepareForTestsService;
 import util.FilesAndDirectoryUtil;
-import util.RuntimeProcessesUtil;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class AfterTestsServiceImpl implements AfterTestsService {
@@ -48,8 +48,8 @@ public class AfterTestsServiceImpl implements AfterTestsService {
     @Value("${regressionFrameworkTestOutputDirectoryName}")
     private String regressionFrameworkTestOutputDirectoryName;
 
-    @Value("${regressionFrameworkResultsLocation}")
-    private String regressionFrameworkResultsLocation;
+    @Value("${webRegressionFrameworkResultsLocation}")
+    private String webRegressionFrameworkResultsLocation;
 
     @Value("${webRegressionFrameworkResultsFileName}")
     private String webRegressionFrameworkResultsFileName;
@@ -59,6 +59,9 @@ public class AfterTestsServiceImpl implements AfterTestsService {
 
     @Value("${regressionFrameworkLogFormatType}")
     private String regressionFrameworkLogFormatType;
+
+    @Autowired
+    PrepareForTestsService prepareForTestsService;
 
     private String newResultDirectoryName;
     private String newTableDateTime;
@@ -73,7 +76,7 @@ public class AfterTestsServiceImpl implements AfterTestsService {
         Path source = Paths.get(regressionFrameworkLocation, regressionFrameworkTestOutputDirectoryName);
         newResultDirectoryName = regressionFrameworkTestOutputDirectoryName + "_" + getDateTimeFormatForDirectory();
         newTableDateTime = getDateTimeFormatForTable();
-        Path target = Paths.get(regressionFrameworkResultsLocation, newResultDirectoryName);
+        Path target = Paths.get(webRegressionFrameworkResultsLocation, newResultDirectoryName);
         FilesAndDirectoryUtil.moveDirectory(source, target);
     }
 
@@ -92,8 +95,8 @@ public class AfterTestsServiceImpl implements AfterTestsService {
     private Document getDocumentFromXML() throws IOException, SAXException, ParserConfigurationException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        LOGGER.info(regressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
-        return documentBuilder.parse(regressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
+        LOGGER.info(webRegressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
+        return documentBuilder.parse(webRegressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
     }
 
     private void saveDocumentToXML(Document document, String resultFilePath) throws TransformerException {
@@ -107,17 +110,6 @@ public class AfterTestsServiceImpl implements AfterTestsService {
         DOMSource source = new DOMSource(document);
         transformer.transform(source, result);
         LOGGER.info(Paths.get(resultFilePath).toAbsolutePath().toString() + " a fost modificat!");
-    }
-
-    private String getMachinesVersion() throws IOException {
-        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
-
-        if (paths.size() != 1) throw new IOException("Too many .jar files!");
-
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " version";
-        LOGGER.info(commandToExecute);
-        Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
-        return RuntimeProcessesUtil.getMSBAdapterVersionFromInputStream(p.getInputStream());
     }
 
     public void updateResultsXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
@@ -138,14 +130,14 @@ public class AfterTestsServiceImpl implements AfterTestsService {
         Element log = document.createElement("Log");
         log.setTextContent(newResultLogFileName);
 
-        String version = getMachinesVersion();
-        LOGGER.info(version);
+        prepareForTestsService.setEnvironment(environment);
+        prepareForTestsService.processMSBAdapterVersions();
 
         Element mas = document.createElement("Mas");
-        mas.setTextContent(version);
+        mas.setTextContent(prepareForTestsService.getMasVersion());
 
         Element mpos = document.createElement("Mpos");
-        mpos.setTextContent(version);
+        mpos.setTextContent(prepareForTestsService.getMposVersion());
 
         newResult.appendChild(name);
         newResult.appendChild(date);
@@ -156,7 +148,7 @@ public class AfterTestsServiceImpl implements AfterTestsService {
         resultsTag.insertBefore(newResult, resultsTag.getFirstChild());
         document.getDocumentElement().normalize();
 
-        saveDocumentToXML(document, regressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
+        saveDocumentToXML(document, webRegressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
     }
 
     public void deleteRecentTestsLogFile() throws IOException {

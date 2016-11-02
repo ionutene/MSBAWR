@@ -68,8 +68,9 @@ public class WebSocketController {
         ObjectMapper objectMapper = new ObjectMapper();
         AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
         LOGGER.info(advancedSearchCriteria);
-        prepareForTestsService.getMachinesVersion(advancedSearchCriteria.getEnv(), "/topic/message", template);
-        prepareForTestsService.zipResults(advancedSearchCriteria.getEnv(), "/topic/message", template);
+        prepareForTestsService.setEnvironment(advancedSearchCriteria.getEnv());
+        prepareForTestsService.getMachinesVersion("/topic/message", template);
+        prepareForTestsService.zipResults("/topic/message", template);
     }
 
 }

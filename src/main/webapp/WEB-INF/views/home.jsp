@@ -4,7 +4,7 @@
 <c:url value="/static/img/spring.png" var="springIMG"/>
 <c:url value="/static/img/reload.png" var="reloadIMG"/>
 <c:url value="/static/pages/howtorun.html" var="staticHowTo"/>
-<c:url value="/static/xml/results.xml" var="staticResults"/>
+<c:url value="/results.xml" var="staticResults"/>
 <c:url value="/static/pages/checkboxesView.html" var="checkboxesView"/>
 <c:url value="/static/css/style.css" var="staticCSS"/>
 <c:url value="/static/js/jquery-3.0.0.min.js" var="staticJQuery"/>

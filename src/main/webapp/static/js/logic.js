@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+//  Initialise and start WebSocket Connection
     var stompConnectCallback = function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/message', function (calResult) {
@@ -10,18 +11,8 @@ $(document).ready(function () {
         },
 
         stompErrorCallback = function (error) {
-            console.log("ERROR_STOMP: ", error.headers.message);
+            console.log("ERROR_STOMP: ", error);
         };
-
-//  Start with the last Select disabled and an action message at the bottom of the Selects
-    $('#select_filter').empty();
-    $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
-    $('#select_filter').prop("disabled", true);
-
-    $("#checkers").hide();
-    $("#checkers").empty();
-    $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
-    $("#checkers").show();
 
     var webSocket,
         serviceLocation = '/ws-stomp-stockjs',
@@ -37,6 +28,20 @@ $(document).ready(function () {
     webSocket = new SockJS(serviceLocation);
     stompClient = Stomp.over(webSocket);
     stompClient.connect({}, stompConnectCallback, stompErrorCallback);
+
+//  Start with the last Select disabled and an action message at the bottom of the Selects
+    $('#select_filter').empty();
+    $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
+    $('#select_filter').prop("disabled", true);
+
+    $("#checkers").hide();
+    $("#checkers").empty();
+    $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
+    $("#checkers").show();
+
+//  PrepareTests for already selected buk30_8600 machines
+/*    $("#section").empty();
+    stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));*/
 
 //  If How To Run Tests page is clicked, load the div #container from old page and spew it into div #section
     $("#howToRunTests").click(function (e) {
