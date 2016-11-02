@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.xml.sax.SAXException;
+import service.PrepareForTestsService;
 import service.ReindexTestsService;
 import service.RunTestsService;
 import service.StopTestsService;
@@ -31,6 +32,9 @@ public class WebSocketController {
 
     @Autowired
     private StopTestsService stopTestsService;
+
+    @Autowired
+    private PrepareForTestsService prepareForTestsService;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -57,6 +61,15 @@ public class WebSocketController {
         AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
         LOGGER.info(advancedSearchCriteria);
         stopTestsService.stopRunningTestsOnEnvironment(advancedSearchCriteria.getEnv(), "/topic/message", template);
+    }
+
+    @MessageMapping(value = "/prepareForTests")
+    public void prepareForTests(String message) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
+        LOGGER.info(advancedSearchCriteria);
+        prepareForTestsService.getMachinesVersion(advancedSearchCriteria.getEnv(), "/topic/message", template);
+        prepareForTestsService.zipResults(advancedSearchCriteria.getEnv(), "/topic/message", template);
     }
 
 }

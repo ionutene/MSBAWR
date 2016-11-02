@@ -90,7 +90,6 @@ $(document).ready(function () {
         // There's no need to erase, just append!
         // $("#section").empty();
         stompClient.send('/app/stopTests', {}, JSON.stringify(gatherOptions()));
-        stopRunningTests();
     });
 
 //  RESET if someone changes the Environment
@@ -105,7 +104,7 @@ $(document).ready(function () {
         $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
         $("#checkers").show();
 
-        prepareForTests();
+        stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));
     });
 
 //  If someone changes the Type of test some action must be taken
@@ -232,27 +231,6 @@ function getCheckboxes() {
         },
         error: function (e) {
             console.log("ERROR_FILTER: ", e);
-        },
-        done: function (e) {
-            //console.log("DONE");
-        }
-    });
-}
-
-function prepareForTests() {
-    var options = gatherOptions();
-
-    $.ajax({
-        type: "POST",
-        contentType: "application/json",
-        url: "/prepareForTestsOnEnv",
-        data: JSON.stringify(options),
-        dataType: 'text',
-        timeout: 100000,
-        success: function (data) {
-        },
-        error: function (e) {
-            console.log("ERROR: ", e);
         },
         done: function (e) {
             //console.log("DONE");

@@ -95,3 +95,24 @@ function stopRunningTests() {
  }
  });
  });*/
+
+function prepareForTests() {
+    var options = gatherOptions();
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/prepareForTestsOnEnv",
+        data: JSON.stringify(options),
+        dataType: 'text',
+        timeout: 100000,
+        success: function (data) {
+        },
+        error: function (e) {
+            console.log("ERROR: ", e);
+        },
+        done: function (e) {
+            //console.log("DONE");
+        }
+    });
+}
