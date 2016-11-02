@@ -3,17 +3,42 @@
 <head>
     <title>MSBAdapterRegression Automated Tests</title>
     <script type="text/JavaScript" src="/static/js/logic.js"></script>
+    <script type="text/JavaScript" src="/static/js/jquery-3.0.0.min.js"></script>
+    <script type="text/JavaScript" src="/static/js/sockjs-1.1.1.min.js"></script>
+    <script type="text/JavaScript" src="/static/js/stomp.min.js"></script>
 </head>
 
-<body onload="printResults('results.xml');">
-<p>Trolololoolo</p>
-<table border='1' align='center' cellpadding='10px' id="resultsTable">
-    <tbody>
+<body>
+<script type="text/JavaScript">
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: '/static/xml/results.xml',
+            dataType: "xml",
+            success: function (data) {
+                printResults(data);
+            },
+            error: function (e) {
+                console.log("ERROR: ", e.responseText);
+            },
+            done: function (e) {
+                //console.log("DONE");
+            }
+        });
+    });
+</script>
+<table border='1' align='center' cellpadding='10px' id="resultsTable" hidden>
+    <thead>
+    <tr>
         <th>Date</th>
         <th>TestNG Results</th>
         <th>Log</th>
         <th>MAS adapter version</th>
         <th>MPOS adapter version</th>
+    </tr>
+    </thead>
+    <tbody>
+
     </tbody>
 </table>
 </body>

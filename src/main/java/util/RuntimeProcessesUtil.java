@@ -22,21 +22,23 @@ public class RuntimeProcessesUtil {
 
     public static void printCMDToWriter(InputStream stream, String destination,
                                         SimpMessagingTemplate messagingTemplate) throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
-        String line;
-        while (((line = r.readLine()) != null)) {
-            LOGGER.debug(line);
-            messagingTemplate.convertAndSend(destination, line + "<br/>");
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(stream))) {
+            String line;
+            while (((line = r.readLine()) != null)) {
+                LOGGER.debug(line);
+                messagingTemplate.convertAndSend(destination, line + "<br/>");
+            }
         }
     }
 
     public static String getMSBAdapterVersionFromInputStream(InputStream stream) throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
-        String line;
         StringBuilder stringBuilder = new StringBuilder();
-        while (((line = r.readLine()) != null)) {
-            LOGGER.debug(line);
-            stringBuilder.append(line);
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(stream))) {
+            String line;
+            while (((line = r.readLine()) != null)) {
+                LOGGER.debug(line);
+                stringBuilder.append(line);
+            }
         }
         return stringBuilder.toString();
     }

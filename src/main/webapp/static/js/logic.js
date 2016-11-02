@@ -4,7 +4,7 @@ $(document).ready(function () {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/message', function (calResult) {
                 // Receives a message.
-                console.log(calResult.body);
+                // console.log(calResult.body);
                 $("#section").append(calResult.body);
             });
         },
@@ -38,25 +38,45 @@ $(document).ready(function () {
     stompClient = Stomp.over(webSocket);
     stompClient.connect({}, stompConnectCallback, stompErrorCallback);
 
-
-    $("a").click(function (e) {
+//  If How To Run Tests page is clicked, load the div #container from old page and spew it into div #section
+    $("#howToRunTests").click(function (e) {
         e.preventDefault();
         var addressValue = $(this).attr("href");
         $("#section").empty();
-        $("#section").load(addressValue, function (response, status, xhr) {
-            if (status == "error") {
-                var msg = "Sorry but there was an error: ";
-                console.log(msg + xhr.status + " " + xhr.statusText);
-            }
-        });
+        $("#section").load(addressValue + " #container");
     });
 
+//  If Results page is clicked, create a table and populate it from results.xml
+    $("#resultsLink").click(function (e) {
+        e.preventDefault();
+        var addressValue = $(this).attr("href");
+        $("#section").empty();
+        $( "<table>" ).attr({
+            border: "1",
+            cellpadding: "10px",
+            id: "resultsTable"
+        }).appendTo("#section");
+        $("#resultsTable").hide();
+        $("<thead>").appendTo("#resultsTable");
+        $("<tr>").appendTo("#resultsTable > thead");
+        $("<th>").text("Date").appendTo("#resultsTable > thead > tr");
+        $("<th>").text("TestNG Results").appendTo("#resultsTable > thead > tr");
+        $("<th>").text("Log").appendTo("#resultsTable > thead > tr");
+        $("<th>").text("MAS adapter version").appendTo("#resultsTable > thead > tr");
+        $("<th>").text("MPOS adapter version").appendTo("#resultsTable > thead > tr");
+        $("<tbody>").appendTo("#resultsTable");
+
+        getXMLFromResources(addressValue);
+    });
+
+//  If ReIndex is clicked, get the latest version of MSBAdapterRegression
     $("#reindex").click(function (e) {
         e.preventDefault();
         $("#section").empty();
         stompClient.send('/app/reindex', {}, "reindex");
     });
 
+//  If Start is clicked, preapare and start tests
     $("#submitTests").click(function (e) {
         e.preventDefault();
         $("#section").empty();
@@ -64,6 +84,7 @@ $(document).ready(function () {
         stompClient.send('/app/runTests', {}, JSON.stringify(collectValuesFromCheckboxes()));
     });
 
+//  If STOP is clicked, stop running tests
     $("#cancelTests").click(function (e) {
         e.preventDefault();
         // There's no need to erase, just append!
@@ -128,7 +149,7 @@ $(document).ready(function () {
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
     $(document).on("change", "input[type='checkbox']", function () {
-        console.log($(this).val());
+        // console.log($(this).val());
         $(this).siblings('ul')
             .find("input[type='checkbox']")
             .prop('checked', this.checked);
@@ -263,33 +284,33 @@ function collectValuesFromCheckboxes() {
     return composite;
 }
 
+function getXMLFromResources(link) {
+    $.ajax({
+        type: "GET",
+        url: link,
+        dataType: "xml",
+        success: function (data) {
+            printResults(data);
+        },
+        error: function (e) {
+            console.log("ERROR: ", e.responseText);
+        },
+        done: function (e) {
+            //console.log("DONE");
+        }
+    });
+}
+
 function printResults(xml) {
-    console.log("A intrat pe aicisea!");
-    var xmlDoc = $.parseXML(xml);
-
-    var $xml = $(xmlDoc);
-
-    var $result = $xml.find("Result");
+    var $xmlParsed = $(xml);
+    var $result = $xmlParsed.find("Result");
 
     $result.each(function () {
-
         var date = $(this).find('Date').text(),
             name = $(this).find('Name').text(),
             log = $(this).find('Log').text(),
             mas = $(this).find('Mas').text(),
             mpos = $(this).find('Mpos').text();
-
-        if (mas == undefined) {
-            mas = '-';
-        } else {
-            mas = mas.nodeValue;
-        }
-
-        if (mpos == undefined) {
-            mpos = '-';
-        } else {
-            mpos = mpos.nodeValue;
-        }
 
         var columnDate = "<td>" + date + "</td>",
             columnTestNG = "<td><a href='results/" + name + "/index.html'>" + name + "</a></td>",
@@ -299,7 +320,10 @@ function printResults(xml) {
 
         var tableRow = "<tr>" + columnDate + columnTestNG + columnLog + columnMASVersion + columnMPOSVersion + "</tr>";
 
-        $('#myTable tr:last').after(tableRow);
+        // $('#resultsTable tr:last').after(tableRow);
+        $('#resultsTable > tbody').append(tableRow);
 
     });
+
+    $("#resultsTable").show();
 }

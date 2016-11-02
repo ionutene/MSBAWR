@@ -82,3 +82,16 @@ function stopRunningTests() {
         }
     });
 }
+
+
+/*    $("a").click(function (e) {
+ e.preventDefault();
+ var addressValue = $(this).attr("href");
+ $("#section").empty();
+ $("#section").load(addressValue, function (response, status, xhr) {
+ if (status == "error") {
+ var msg = "Sorry but there was an error: ";
+ console.log(msg + xhr.status + " " + xhr.statusText);
+ }
+ });
+ });*/
