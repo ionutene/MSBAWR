@@ -72,7 +72,30 @@ $(document).ready(function () {
         $("<tbody>").appendTo("#resultsTable");
 
         getXMLFromResources(addressValue);
+        if (stompClient != null) {
+            stompClient.disconnect();
+        }
     });
+
+
+
+/*    $("#testNGPage").click(function (e) {
+        e.preventDefault();
+        var addressValue = $(this).attr("href");
+        $("#section").empty();
+        console.log("Incerc sa incarc pagina de testNG!" + addressValue);
+        $("#section").load(addressValue);
+    });*/
+
+
+
+/*    $("#msbarLog").click(function (e) {
+        e.preventDefault();
+        var addressValue = $(this).attr("href");
+        $("#section").empty();
+        console.log("Incerc sa incarc pagina de msbarLog!" + addressValue);
+        $("#section").load(addressValue);
+    });*/
 
 //  If ReIndex is clicked, get the latest version of MSBAdapterRegression
     $("#reindex").click(function (e) {
@@ -296,8 +319,8 @@ function printResults(xml) {
             mpos = $(this).find('Mpos').text();
 
         var columnDate = "<td>" + date + "</td>",
-            columnTestNG = "<td><a href='results/" + name + "/index.html'>" + name + "</a></td>",
-            columnLog = "<td><a href='results/" + name + "/" + log + "'>" + log + "</a></td>",
+            columnTestNG = "<td><a href='/results/" + name + "/index.html' id='testNGPage'>" + name + "</a></td>",
+            columnLog = "<td><a href='/results/" + name + "/" + log + "' id='msbarLog'>" + log + "</a></td>",
             columnMASVersion = "<td>" + mas + "</td>",
             columnMPOSVersion = "<td>" + mpos + "</td>";
 
@@ -306,6 +329,26 @@ function printResults(xml) {
         // $('#resultsTable tr:last').after(tableRow);
         $('#resultsTable > tbody').append(tableRow);
 
+    });
+
+    //  When dealing with dynamically created elements, the normal Event Handlers don't work
+//  http://api.jquery.com/on/ #Direct and delegated events
+    $(document).on("click", "a#testNGPage", function (event) {
+        event.preventDefault();
+        var addressValue = $(this).attr("href");
+        $("#section").empty();
+        $("<iframe>").attr("src", addressValue).appendTo("#section");
+        // $("#section").load(addressValue);
+    });
+
+    //  When dealing with dynamically created elements, the normal Event Handlers don't work
+//  http://api.jquery.com/on/ #Direct and delegated events
+    $(document).on("click", "a#msbarLog", function (event) {
+        event.preventDefault();
+        var addressValue = $(this).attr("href");
+        $("#section").empty();
+        $("<pre>").attr("id", "formattedLog").appendTo("#section");
+        $("#formattedLog").load(addressValue);
     });
 
     $("#resultsTable").show();

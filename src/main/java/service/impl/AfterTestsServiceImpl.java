@@ -60,6 +60,9 @@ public class AfterTestsServiceImpl implements AfterTestsService {
     @Value("${regressionFrameworkLogFormatType}")
     private String regressionFrameworkLogFormatType;
 
+    @Value("${regressionFrameworkLogSeparator}")
+    private String regressionFrameworkLogSeparator;
+
     @Autowired
     PrepareForTestsService prepareForTestsService;
 
@@ -74,9 +77,10 @@ public class AfterTestsServiceImpl implements AfterTestsService {
 
     public void moveTestsOutputToResults() throws IOException {
         Path source = Paths.get(regressionFrameworkLocation, regressionFrameworkTestOutputDirectoryName);
-        newResultDirectoryName = regressionFrameworkTestOutputDirectoryName + "_" + getDateTimeFormatForDirectory();
+        newResultDirectoryName = regressionFrameworkTestOutputDirectoryName + regressionFrameworkLogSeparator + getDateTimeFormatForDirectory();
         newTableDateTime = getDateTimeFormatForTable();
         Path target = Paths.get(webRegressionFrameworkResultsLocation, newResultDirectoryName);
+        LOGGER.info("Moving folder: " + source.toString() + " to folder: " + target.toString());
         FilesAndDirectoryUtil.moveDirectory(source, target);
     }
 
@@ -95,7 +99,7 @@ public class AfterTestsServiceImpl implements AfterTestsService {
     private Document getDocumentFromXML() throws IOException, SAXException, ParserConfigurationException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        LOGGER.info(webRegressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
+        LOGGER.info("Loading XML from: " + webRegressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
         return documentBuilder.parse(webRegressionFrameworkResultsLocation + webRegressionFrameworkResultsFileName);
     }
 
@@ -109,11 +113,11 @@ public class AfterTestsServiceImpl implements AfterTestsService {
         StreamResult result = new StreamResult(Paths.get(resultFilePath).toFile());
         DOMSource source = new DOMSource(document);
         transformer.transform(source, result);
-        LOGGER.info(Paths.get(resultFilePath).toAbsolutePath().toString() + " a fost modificat!");
+        LOGGER.info("Saving XML from: " + Paths.get(resultFilePath).toAbsolutePath().toString());
     }
 
     public void updateResultsXML() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-        newResultLogFileName = regressionFrameworkLogFileName + "_" + environment + regressionFrameworkLogFormatType;
+        newResultLogFileName = regressionFrameworkLogFileName + regressionFrameworkLogSeparator + environment + regressionFrameworkLogFormatType;
 
         Document document = getDocumentFromXML();
         document.getDocumentElement().normalize();
@@ -153,7 +157,7 @@ public class AfterTestsServiceImpl implements AfterTestsService {
 
     public void deleteRecentTestsLogFile() throws IOException {
         Path logFilePath = Paths.get(regressionFrameworkLocation, newResultLogFileName);
-        LOGGER.info(logFilePath.toAbsolutePath().toString());
+        LOGGER.info("Deleting recent log file: " + logFilePath.toAbsolutePath().toString());
         Files.delete(logFilePath);
     }
 }

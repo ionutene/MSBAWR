@@ -84,7 +84,7 @@ function stopRunningTests() {
 }
 
 
-/*    $("a").click(function (e) {
+    $("a").click(function (e) {
  e.preventDefault();
  var addressValue = $(this).attr("href");
  $("#section").empty();
@@ -94,7 +94,7 @@ function stopRunningTests() {
  console.log(msg + xhr.status + " " + xhr.statusText);
  }
  });
- });*/
+ });
 
 function prepareForTests() {
     var options = gatherOptions();
@@ -116,3 +116,18 @@ function prepareForTests() {
         }
     });
 }
+
+/*        $.ajax({
+ type: "GET",
+ url: addressValue,
+ dataType: "html",
+ success: function (data) {
+ printResults(data);
+ },
+ error: function (e) {
+ console.log("ERROR: ", e.responseText);
+ },
+ done: function (e) {
+ //console.log("DONE");
+ }
+ });*/
