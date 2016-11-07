@@ -1,5 +1,6 @@
 package service.impl;
 
+import data.SearchCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,45 +30,76 @@ public class RunTestsServiceImpl implements RunTestsService {
     @Value("${os.cmd.option}")
     private String osCMDOption;
 
+    @Value("${os.cmd.cd}")
+    private String osCMDCd;
+
+    @Value("${os.cmd.andJar}")
+    private String osCMDAndJar;
+
+    @Value("${os.cmd.anyJar}")
+    private String osCMDAnyJar;
+
     @Value("${regressionFrameworkLocation}")
     private String regressionFrameworkLocation;
 
-    @Value("${regressionFrameworkLocationCMD}")
-    private String regressionFrameworkLocationCMD;
-
     private String processedArguments;
-    private String environment;
 
     @Autowired
     AfterTestsService afterTestsService;
 
-    public void setArguments(List<String> values) {
+    private SimpMessagingTemplate messagingTemplate;
+    private SearchCriteria searchCriteria;
+    @Value("${stompDestination}")
+    private String stompDestination;
+
+    public void setSimpMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    public void setSearchCriteria(SearchCriteria searchCriteria) {
+        this.searchCriteria = searchCriteria;
+    }
+
+    public void runTests()
+            throws IOException, ParserConfigurationException, SAXException, TransformerException {
+
+        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, osCMDAnyJar);
+
+        if (paths.size() != 1) throw new IOException("Too many .jar files!");
+
+//      TODO remove CTA test hardcoding
+        String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + searchCriteria.getEnvironment() + " cta";
+        LOGGER.info(commandToExecute);
+        Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
+        RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messagingTemplate);
+        while (p.isAlive()) {/* wait until process finishes */}
+//      Then clean-up
+        finishTestsAndCleanUp();
+    }
+
+//  TODO start implementing way to call tests from test framework
+    private void parseArguments() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (String value : values) {
+        for (String value : searchCriteria.getCheckBoxes()) {
             stringBuilder.append(value).append(" ");
         }
         this.processedArguments = stringBuilder.toString();
     }
 
-    public void setEnvironment(String environment) {
-        this.environment = environment;
-    }
-
-    public void runTestsForEnvironmentWithArgs(String destination, SimpMessagingTemplate messagingTemplate) throws IOException, ParserConfigurationException, SAXException, TransformerException {
-        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
-
-        if (paths.size() != 1) throw new IOException("Too many .jar files!");
-
-//      TODO remove CTA test hardcoding
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " cta";
-        LOGGER.info(commandToExecute);
-        Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
-        RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
-        while (p.isAlive()) {/* wait until process finishes */}
-        afterTestsService.setEnvironment(environment);
-        afterTestsService.moveTestsOutputToResults();
-        afterTestsService.updateResultsXML();
+    private void finishTestsAndCleanUp() throws IOException, TransformerException, SAXException, ParserConfigurationException {
+        afterTestsService.setEnvironment(searchCriteria.getEnvironment());
+        afterTestsService.init();
+//      If tests weren't stopped manually, move output results and update results.xml
+        if (!afterTestsService.wereTestsStoppedManually()) {
+            messagingTemplate.convertAndSend(stompDestination, "Tests were finished successfully, moving results and updating results.xml!");
+            afterTestsService.moveTestsOutputToResults();
+            afterTestsService.updateResultsXML();
+        } else {
+//            Clean-up result-output folder
+            messagingTemplate.convertAndSend(stompDestination, "Tests were stopped, clean-up ensues!");
+            afterTestsService.deleteTestOutputResults();
+        }
+//      Delete recent log file regardless of tests run time
         afterTestsService.deleteRecentTestsLogFile();
     }
-
 }

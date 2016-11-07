@@ -6,6 +6,7 @@ import data.SearchCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -36,12 +37,15 @@ public class WebSocketController {
     @Autowired
     private PrepareForTestsService prepareForTestsService;
 
+    @Value("${stompDestination}")
+    private String stompDestination;
+
     @Autowired
     private SimpMessagingTemplate template;
 
     @MessageMapping("/reindex")
     public void reindex(String message) throws Exception {
-        reindexTestsService.getLatestRegressionFrameworkJar("/topic/message", template);
+        reindexTestsService.getLatestRegressionFrameworkJar(stompDestination, template);
     }
 
     @MessageMapping("/runTests")
@@ -50,9 +54,9 @@ public class WebSocketController {
         ObjectMapper objectMapper = new ObjectMapper();
         SearchCriteria searchCriteria = objectMapper.readValue(message, SearchCriteria.class);
         LOGGER.info(searchCriteria);
-        runTestsService.setEnvironment(searchCriteria.getEnvironment());
-        runTestsService.setArguments(searchCriteria.getCheckBoxes());
-        runTestsService.runTestsForEnvironmentWithArgs("/topic/message", template);
+        runTestsService.setSimpMessagingTemplate(template);
+        runTestsService.setSearchCriteria(searchCriteria);
+        runTestsService.runTests();
     }
 
     @MessageMapping("/stopTests")
@@ -60,7 +64,7 @@ public class WebSocketController {
         ObjectMapper objectMapper = new ObjectMapper();
         AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
         LOGGER.info(advancedSearchCriteria);
-        stopTestsService.stopRunningTestsOnEnvironment(advancedSearchCriteria.getEnv(), "/topic/message", template);
+        stopTestsService.stopRunningTestsOnEnvironment(advancedSearchCriteria.getEnv(), stompDestination, template);
     }
 
     @MessageMapping(value = "/prepareForTests")
@@ -69,8 +73,9 @@ public class WebSocketController {
         AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
         LOGGER.info(advancedSearchCriteria);
         prepareForTestsService.setEnvironment(advancedSearchCriteria.getEnv());
-        prepareForTestsService.getMachinesVersion("/topic/message", template);
-        prepareForTestsService.zipResults("/topic/message", template);
+        prepareForTestsService.setSimpMessageTemplate(template);
+        prepareForTestsService.getMachinesVersion();
+        prepareForTestsService.zipResults();
     }
 
 }

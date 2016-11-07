@@ -8,7 +8,10 @@ import java.io.IOException;
 
 public interface AfterTestsService {
     void setEnvironment(String environment);
+    void init();
     void moveTestsOutputToResults() throws IOException;
     void updateResultsXML() throws ParserConfigurationException, SAXException, IOException, TransformerException;
     void deleteRecentTestsLogFile() throws IOException;
+    boolean wereTestsStoppedManually();
+    void deleteTestOutputResults() throws IOException;
 }

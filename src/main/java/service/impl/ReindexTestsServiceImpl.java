@@ -37,14 +37,17 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
     @Value("${regressionFrameworkLocation}")
     private String regressionFrameworkLocation;
 
-    @Value("${regressionFrameworkLocationCMD}")
-    private String regressionFrameworkLocationCMD;
-
     @Value("${os.cmd.path}")
     private String osCMDPath;
 
     @Value("${os.cmd.option}")
     private String osCMDOption;
+
+    @Value("${os.cmd.cd}")
+    private String osCMDCd;
+
+    @Value("${os.cmd.andJar}")
+    private String osCMDAndJar;
 
     //    @Autowired
 //  TODO Check if further versions of SpringWebSockets work with PROXY_CLASSES
@@ -105,7 +108,7 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
             LOGGER.info("Execute generation of tests.xml<br/>");
             payload.convertAndSend(destination, "Execute generation of tests.xml<br/>");
 
-            String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + buildFileName + " webtests";
+            String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + buildFileName + " webtests";
             LOGGER.info(commandToExecute);
             payload.convertAndSend(destination, commandToExecute + "<br/>");
 

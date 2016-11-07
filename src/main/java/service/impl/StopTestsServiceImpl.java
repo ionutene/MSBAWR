@@ -21,16 +21,13 @@ public class StopTestsServiceImpl implements StopTestsService {
     @Value("${os.cmd.option}")
     private String osCMDOption;
 
-    @Value("${regressionFrameworkLocation}")
-    private String regressionFrameworkLocation;
+    @Value("${stompDestination}")
+    private String stompDestination;
 
-    @Value("${regressionFrameworkLocationCMD}")
-    private String regressionFrameworkLocationCMD;
-
-    public void stopRunningTestsOnEnvironment(String environment, String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
+    public void stopRunningTestsOnEnvironment(String environment, SimpMessagingTemplate messagingTemplate) throws IOException {
         String commandToExecute = "for /f \"tokens=1\" %i in ('jps -m ^| find \"" + environment + "\"') do ( taskkill /F /PID %i )";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
-        RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
+        RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messagingTemplate);
     }
 }

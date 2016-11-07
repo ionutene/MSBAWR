@@ -24,28 +24,39 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
     @Value("${os.cmd.option}")
     private String osCMDOption;
 
+    @Value("${os.cmd.cd}")
+    private String osCMDCd;
+
+    @Value("${os.cmd.andJar}")
+    private String osCMDAndJar;
+
+    @Value("${os.cmd.anyJar}")
+    private String osCMDAnyJar;
+
     @Value("${regressionFrameworkLocation}")
     private String regressionFrameworkLocation;
 
-    @Value("${regressionFrameworkLocationCMD}")
-    private String regressionFrameworkLocationCMD;
+    @Value("${stompDestination}")
+    private String stompDestination;
+
+    private SimpMessagingTemplate messageTemplate;
 
     private String masVersion;
     private String mposVersion;
     private String environment;
 
-    public void getMachinesVersion(String destination, SimpMessagingTemplate messagingTemplate) throws IOException {
-        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
+    public void getMachinesVersion() throws IOException {
+        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, osCMDAnyJar);
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
 
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " version";
+        String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + environment + " version";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
-        RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, messagingTemplate);
+        RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messageTemplate);
     }
 
-    public void zipResults(String destination, SimpMessagingTemplate messagingTemplate) {
+    public void zipResults() {
 
     }
 
@@ -54,20 +65,19 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
 
-        String commandToExecute = regressionFrameworkLocationCMD + " && java -jar " + paths.get(0) + " " + environment + " version";
+        String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + environment + " version";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         String content = RuntimeProcessesUtil.getMSBAdapterVersionFromInputStream(p.getInputStream());
 
-        if(content.length() > 1){
+        if (content.length() > 1) {
             if (content.contains("MAS:") && content.contains("MPOS:")) {
-                masVersion = content.substring(content.indexOf("MAS:") + 4, content.indexOf(")") + 1 );
+                masVersion = content.substring(content.indexOf("MAS:") + 4, content.indexOf(")") + 1);
                 masVersion = masVersion.substring(0, masVersion.indexOf(" (")) + "\\&lt\\;br\\/\\&gt\\;" + masVersion.substring(masVersion.indexOf("("));
-                mposVersion = content.substring(content.indexOf("MPOS:") + 5, content.lastIndexOf(")") + 1 );
+                mposVersion = content.substring(content.indexOf("MPOS:") + 5, content.lastIndexOf(")") + 1);
                 mposVersion = mposVersion.substring(0, mposVersion.indexOf(" (")) + "\\&lt\\;br\\/\\&gt\\;" + mposVersion.substring(mposVersion.indexOf("("));
-            }
-            else if (content.contains("AIX") || content.contains("Linux")) {
-                masVersion = content.substring(content.indexOf(":") + 1, content.indexOf(")") + 1 );
+            } else if (content.contains("AIX") || content.contains("Linux")) {
+                masVersion = content.substring(content.indexOf(":") + 1, content.indexOf(")") + 1);
                 masVersion = masVersion.substring(0, masVersion.indexOf(" (")) + "\\&lt\\;br\\/\\&gt\\;" + masVersion.substring(masVersion.indexOf("("));
                 mposVersion = "-";
             }
@@ -84,5 +94,9 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
 
     public void setEnvironment(String environment) {
         this.environment = environment;
+    }
+
+    public void setSimpMessageTemplate(SimpMessagingTemplate simpMessageTemplate) {
+        this.messageTemplate = simpMessageTemplate;
     }
 }
