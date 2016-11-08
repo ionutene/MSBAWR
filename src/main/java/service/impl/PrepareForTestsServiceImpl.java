@@ -61,7 +61,7 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
     }
 
     public void processMSBAdapterVersions() throws IOException {
-        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, "*.{jar}");
+        List<Path> paths = FilesAndDirectoryUtil.findFilesInPathWithPattern(regressionFrameworkLocation, osCMDAnyJar);
 
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
 
@@ -73,12 +73,12 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
         if (content.length() > 1) {
             if (content.contains("MAS:") && content.contains("MPOS:")) {
                 masVersion = content.substring(content.indexOf("MAS:") + 4, content.indexOf(")") + 1);
-                masVersion = masVersion.substring(0, masVersion.indexOf(" (")) + "\\&lt\\;br\\/\\&gt\\;" + masVersion.substring(masVersion.indexOf("("));
+                masVersion = masVersion.substring(0, masVersion.indexOf(" (")) + "<br/>" + masVersion.substring(masVersion.indexOf("("));
                 mposVersion = content.substring(content.indexOf("MPOS:") + 5, content.lastIndexOf(")") + 1);
-                mposVersion = mposVersion.substring(0, mposVersion.indexOf(" (")) + "\\&lt\\;br\\/\\&gt\\;" + mposVersion.substring(mposVersion.indexOf("("));
+                mposVersion = mposVersion.substring(0, mposVersion.indexOf(" (")) + "<br/>" + mposVersion.substring(mposVersion.indexOf("("));
             } else if (content.contains("AIX") || content.contains("Linux")) {
                 masVersion = content.substring(content.indexOf(":") + 1, content.indexOf(")") + 1);
-                masVersion = masVersion.substring(0, masVersion.indexOf(" (")) + "\\&lt\\;br\\/\\&gt\\;" + masVersion.substring(masVersion.indexOf("("));
+                masVersion = masVersion.substring(0, masVersion.indexOf(" (")) + "<br/>" + masVersion.substring(masVersion.indexOf("("));
                 mposVersion = "-";
             }
         }

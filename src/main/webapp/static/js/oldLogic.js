@@ -131,3 +131,27 @@ function prepareForTests() {
  //console.log("DONE");
  }
  });*/
+
+
+
+/*    $("#testNGPage").click(function (e) {
+ e.preventDefault();
+ var addressValue = $(this).attr("href");
+ $("#section").empty();
+ console.log("Incerc sa incarc pagina de testNG!" + addressValue);
+ $("#section").load(addressValue);
+ });*/
+
+
+
+/*    $("#msbarLog").click(function (e) {
+ e.preventDefault();
+ var addressValue = $(this).attr("href");
+ $("#section").empty();
+ console.log("Incerc sa incarc pagina de msbarLog!" + addressValue);
+ $("#section").load(addressValue);
+ });*/
+
+/*        if (stompClient != null) {
+ stompClient.disconnect();
+ }*/

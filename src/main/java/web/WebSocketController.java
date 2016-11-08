@@ -64,7 +64,7 @@ public class WebSocketController {
         ObjectMapper objectMapper = new ObjectMapper();
         AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
         LOGGER.info(advancedSearchCriteria);
-        stopTestsService.stopRunningTestsOnEnvironment(advancedSearchCriteria.getEnv(), stompDestination, template);
+        stopTestsService.stopRunningTestsOnEnvironment(advancedSearchCriteria.getEnv(), template);
     }
 
     @MessageMapping(value = "/prepareForTests")

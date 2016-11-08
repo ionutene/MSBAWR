@@ -72,30 +72,7 @@ $(document).ready(function () {
         $("<tbody>").appendTo("#resultsTable");
 
         getXMLFromResources(addressValue);
-        if (stompClient != null) {
-            stompClient.disconnect();
-        }
     });
-
-
-
-/*    $("#testNGPage").click(function (e) {
-        e.preventDefault();
-        var addressValue = $(this).attr("href");
-        $("#section").empty();
-        console.log("Incerc sa incarc pagina de testNG!" + addressValue);
-        $("#section").load(addressValue);
-    });*/
-
-
-
-/*    $("#msbarLog").click(function (e) {
-        e.preventDefault();
-        var addressValue = $(this).attr("href");
-        $("#section").empty();
-        console.log("Incerc sa incarc pagina de msbarLog!" + addressValue);
-        $("#section").load(addressValue);
-    });*/
 
 //  If ReIndex is clicked, get the latest version of MSBAdapterRegression
     $("#reindex").click(function (e) {
