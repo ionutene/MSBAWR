@@ -2,23 +2,39 @@
     background-color: black;
     color: white;
     text-align: center;
-    padding: 5px;
+    height: 10%;
+    /*padding: 5px;*/
+}
+
+/*
+In order for divs to be 100% of the height of their parent, the parent has to have a defined height.
+http://stackoverflow.com/questions/10490933/inherit-height-of-parent-doesnt-work
+*/
+#middle {
+    height: 85%;
 }
 
 #nav {
     background-color: #eeeeee;
-    height: 80%;
+    /*
     width: calc(35% - 10px);
-    float: left;
+    float: left;*/
+    /*overflow: auto;*/
+    /*padding: 5px;*/
+    height: 100%;
     overflow: auto;
-    padding: 5px;
 }
 
 #section {
-    height: 80%;
+    /*
     width: calc(65% - 20px);
-    float: left;
-    padding: 10px;
+    float: left;*/
+    /*padding: 10px;*/
+    height: 100%;
+    overflow: auto;
+}
+
+#checkers {
     overflow: auto;
 }
 
@@ -27,7 +43,8 @@
     color: white;
     clear: both;
     text-align: center;
-    padding: 5px;
+    /*padding: 5px;*/
+    height: 5%;
 }
 
 ul {
@@ -47,5 +64,5 @@ input:disabled {
 
 iframe {
     height: 100%;
-    width: 100%
+    width: 100%;
 }

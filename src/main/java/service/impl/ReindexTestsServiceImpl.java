@@ -65,24 +65,24 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
             payload.convertAndSend(destination, "Looking for: " + kitFileName);
             LOGGER.info("Looking for: " + kitFileName);
 
-            payload.convertAndSend(destination, "Check if the .zip file exists<br/>");
-            LOGGER.info("Check if the .zip file exists<br/>");
+            payload.convertAndSend(destination, "Check if the .zip file exists\n");
+            LOGGER.info("Check if the .zip file exists");
             // check if the .zip file exists, if it doesn't clean up the folder
             if (!FilesAndDirectoryUtil.findFileInPath(kitFileName, regressionFrameworkLocation)) {
-                LOGGER.info("Clean-up the folder<br/>");
-                payload.convertAndSend(destination, "Clean-up the folder<br/>");
+                LOGGER.info("Clean-up the folder");
+                payload.convertAndSend(destination, "Clean-up the folder\n");
 
                 FilesAndDirectoryUtil.deleteDirectory(regressionFrameworkLocation);
                 FilesAndDirectoryUtil.createDirectory(regressionFrameworkLocation);
 
                 // copy the new .zip file
-                LOGGER.info("Copy the new .zip file<br/>");
-                payload.convertAndSend(destination, "Copy the new .zip file<br/>");
+                LOGGER.info("Copy the new .zip file");
+                payload.convertAndSend(destination, "Copy the new .zip file\n");
 
                 SshUtil.CopySftpFileToFile(installerKitPath, jenkinsSession, regressionFrameworkLocation + kitFileName);
                 // Unzip and overwrite files silently
-                LOGGER.info("Unzip and overwrite files silently<br/>");
-                payload.convertAndSend(destination, "Unzip and overwrite files silently<br/>");
+                LOGGER.info("Unzip and overwrite files silently");
+                payload.convertAndSend(destination, "Unzip and overwrite files silently\n");
 
                 ZipFile zipFile = new ZipFile(regressionFrameworkLocation + kitFileName);
                 zipFile.extractAll(regressionFrameworkLocation);
@@ -92,25 +92,25 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
             }
 
             // get the latest build from jenkins
-            LOGGER.info("Get the latest build from jenkins<br/>");
-            payload.convertAndSend(destination, "Get the latest build from jenkins<br/>");
+            LOGGER.info("Get the latest build from jenkins");
+            payload.convertAndSend(destination, "Get the latest build from jenkins\n");
 
             String latestBuildPath = SshUtil.getLatestBuildPath(jenkinsProject, ".jar", jenkinsSession);
             String buildFileName = latestBuildPath.substring(latestBuildPath.lastIndexOf("/") + 1);
 
             // copy the latest build
-            LOGGER.info("Copy the latest build<br/>");
-            payload.convertAndSend(destination, "Copy the latest build<br/>");
+            LOGGER.info("Copy the latest build");
+            payload.convertAndSend(destination, "Copy the latest build\n");
 
             SshUtil.CopySftpFileToFile(latestBuildPath, jenkinsSession, regressionFrameworkLocation + buildFileName);
 
             // execute generation of tests.xml
-            LOGGER.info("Execute generation of tests.xml<br/>");
-            payload.convertAndSend(destination, "Execute generation of tests.xml<br/>");
+            LOGGER.info("Execute generation of tests.xml");
+            payload.convertAndSend(destination, "Execute generation of tests.xml\n");
 
             String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + buildFileName + " webtests";
             LOGGER.info(commandToExecute);
-            payload.convertAndSend(destination, commandToExecute + "<br/>");
+            payload.convertAndSend(destination, commandToExecute + "\n");
 
             Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
             RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, payload);

@@ -26,7 +26,7 @@ public class RuntimeProcessesUtil {
             String line;
             while (((line = r.readLine()) != null)) {
                 LOGGER.debug(line);
-                messagingTemplate.convertAndSend(destination, line + "<br/>");
+                messagingTemplate.convertAndSend(destination, line + "\n");
             }
         }
     }

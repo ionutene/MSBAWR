@@ -6,7 +6,7 @@ $(document).ready(function () {
             stompClient.subscribe('/topic/message', function (calResult) {
                 // Receives a message.
                 // console.log(calResult.body);
-                $("#section").append(calResult.body);
+                $("#preSection").append(calResult.body);
             });
         },
 
@@ -57,9 +57,10 @@ $(document).ready(function () {
         var addressValue = $(this).attr("href");
         $("#section").empty();
         $( "<table>" ).attr({
-            border: "1",
-            cellpadding: "10px",
-            id: "resultsTable"
+/*            border: "1",
+            cellpadding: "10px",*/
+            id: "resultsTable",
+            class: "table table-hover"
         }).appendTo("#section");
         $("#resultsTable").hide();
         $("<thead>").appendTo("#resultsTable");
@@ -70,7 +71,7 @@ $(document).ready(function () {
         $("<th>").text("MAS adapter version").appendTo("#resultsTable > thead > tr");
         $("<th>").text("MPOS adapter version").appendTo("#resultsTable > thead > tr");
         $("<tbody>").appendTo("#resultsTable");
-
+        //class="table table-hover"
         getXMLFromResources(addressValue);
     });
 
@@ -78,6 +79,7 @@ $(document).ready(function () {
     $("#reindex").click(function (e) {
         e.preventDefault();
         $("#section").empty();
+        $("<pre>").attr("id", "preSection").appendTo("#section");
         stompClient.send('/app/reindex', {}, "reindex");
     });
 
@@ -85,6 +87,7 @@ $(document).ready(function () {
     $("#submitTests").click(function (e) {
         e.preventDefault();
         $("#section").empty();
+        $("<pre>").attr("id", "preSection").appendTo("#section");
         // var headers = {'content-type': 'application/json'};
         stompClient.send('/app/runTests', {}, JSON.stringify(collectValuesFromCheckboxes()));
     });
@@ -94,6 +97,9 @@ $(document).ready(function () {
         e.preventDefault();
         // There's no need to erase, just append!
         // $("#section").empty();
+        if (!$("#preSection").length) {
+            $("<pre>").attr("id", "preSection").appendTo("#section");
+        }
         stompClient.send('/app/stopTests', {}, JSON.stringify(gatherOptions()));
     });
 
@@ -108,7 +114,11 @@ $(document).ready(function () {
         $("#checkers").empty();
         $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
         $("#checkers").show();
+        $("#submitTests").attr("disabled", "disabled");
+        $("#cancelTests").attr("disabled", "disabled");
 
+        $("#section").empty();
+        $("<pre>").attr("id", "preSection").appendTo("#section");
         stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));
     });
 
@@ -124,6 +134,8 @@ $(document).ready(function () {
                 $("#checkers").empty();
                 $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
                 $("#checkers").show();
+                $("#submitTests").attr("disabled", "disabled");
+                $("#cancelTests").attr("disabled", "disabled");
                 break;
 //          For all other cases you want to deffer the logic to the server
             default :
@@ -142,6 +154,8 @@ $(document).ready(function () {
                 $("#checkers").empty();
                 $("<p>").text("Here is where the checkboxes will be, please select a filter!").appendTo("#checkers");
                 $("#checkers").show();
+                $("#submitTests").attr("disabled", "disabled");
+                $("#cancelTests").attr("disabled", "disabled");
                 break;
 //          For all other cases you want to deffer the logic to the server
             default :
@@ -231,8 +245,8 @@ function getCheckboxes() {
         success: function (data) {
             $("#checkers").empty();
             $("#checkers").html(data);
-            $("#submitTests").show();
-            $("#cancelTests").show();
+            $("#submitTests").removeAttr('disabled');
+            $("#cancelTests").removeAttr('disabled');
         },
         error: function (e) {
             console.log("ERROR_FILTER: ", e);
@@ -308,25 +322,25 @@ function printResults(xml) {
 
     });
 
-    //  When dealing with dynamically created elements, the normal Event Handlers don't work
-//  http://api.jquery.com/on/ #Direct and delegated events
-    $(document).on("click", "a#testNGPage", function (event) {
-        event.preventDefault();
-        var addressValue = $(this).attr("href");
-        $("#section").empty();
-        $("<iframe>").attr("src", addressValue).appendTo("#section");
-        // $("#section").load(addressValue);
-    });
-
-    //  When dealing with dynamically created elements, the normal Event Handlers don't work
-//  http://api.jquery.com/on/ #Direct and delegated events
-    $(document).on("click", "a#msbarLog", function (event) {
-        event.preventDefault();
-        var addressValue = $(this).attr("href");
-        $("#section").empty();
-        $("<pre>").attr("id", "formattedLog").appendTo("#section");
-        $("#formattedLog").load(addressValue);
-    });
-
     $("#resultsTable").show();
 }
+
+//  When dealing with dynamically created elements, the normal Event Handlers don't work
+//  http://api.jquery.com/on/ #Direct and delegated events
+$(document).on("click", "a#testNGPage", function (event) {
+    event.preventDefault();
+    var addressValue = $(this).attr("href");
+    $("#section").empty();
+    $("<iframe>").attr("src", addressValue).appendTo("#section");
+    // $("#section").load(addressValue);
+});
+
+//  When dealing with dynamically created elements, the normal Event Handlers don't work
+//  http://api.jquery.com/on/ #Direct and delegated events
+$(document).on("click", "a#msbarLog", function (event) {
+    event.preventDefault();
+    var addressValue = $(this).attr("href");
+    $("#section").empty();
+    $("<pre>").attr("id", "formattedLog").appendTo("#section");
+    $("#formattedLog").load(addressValue);
+});
