@@ -155,3 +155,33 @@ function prepareForTests() {
 /*        if (stompClient != null) {
  stompClient.disconnect();
  }*/
+
+/*
+*
+* <%--<form action="">--%>
+ <%--<label for="select_envs">Select Environment:</label><select id="select_envs" class="form-control"></select>--%>
+ <%--<label for="select_type">Select Test Type:</label><select id="select_type" class="form-control"></select>--%>
+ <%--<label for="select_filter">Select Filter:</label><select id="select_filter" class="form-control"></select>--%>
+ <%--</form>--%>
+ <%--<form class="form-inline">
+ <div class="form-group form-group-sm">
+ <label class="col-sm-2 control-label" for="select_envs">Environment:</label>
+ <div class="col-sm-4">
+ <select id="select_envs" class="form-control"></select>
+ </div>
+ </div>
+ <div class="form-group form-group-sm">
+ <label class="col-sm-2 control-label" for="select_type">TestType:</label>
+ <div class="col-sm-4">
+ <select id="select_type" class="form-control"></select>
+ </div>
+ </div>
+ <div class="form-group form-group-sm">
+ <label class="col-sm-2 control-label" for="select_filter">Filter:</label>
+ <div class="col-sm-4">
+ <select id="select_filter" class="form-control"></select>
+ </div>
+ </div>
+ </form>--%>
+*
+* */
