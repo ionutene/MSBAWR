@@ -40,8 +40,8 @@ $(document).ready(function () {
     $("#checkers").show();
 
 //  PrepareTests for already selected buk30_8600 machines
-/*    $("#section").empty();
-    stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));*/
+    /*    $("#section").empty();
+     stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));*/
 
 //  If How To Run Tests page is clicked, load the div #container from old page and spew it into div #section
     $("#howToRunTests").click(function (e) {
@@ -56,9 +56,9 @@ $(document).ready(function () {
         e.preventDefault();
         var addressValue = $(this).attr("href");
         $("#section").empty();
-        $( "<table>" ).attr({
-/*            border: "1",
-            cellpadding: "10px",*/
+        $("<table>").attr({
+            /*            border: "1",
+             cellpadding: "10px",*/
             id: "resultsTable",
             class: "table table-hover"
         }).appendTo("#section");
@@ -167,10 +167,21 @@ $(document).ready(function () {
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
     $(document).on("change", "input[type='checkbox']", function () {
-        // console.log($(this).val());
-        $(this).siblings('ul')
+        console.log($(this).val() + " has UL siblings: " + $(this).siblings('ul').length);
+/*        $(this).siblings('ul')
             .find("input[type='checkbox']")
-            .prop('checked', this.checked);
+            .prop('checked', this.checked);*/
+        // TODO rework eventHandler added because it doesn't follow tree logic
+        if ($(this).siblings('ul').length) {
+            $(this).siblings('ul')
+                .find("input[type='checkbox']")
+                .prop('checked', this.checked);
+        } else {
+            $(this).parents('ul')
+                .find("input[type='checkbox']")
+                .prop('checked', this.checked);
+        }
+
     });
 
 });

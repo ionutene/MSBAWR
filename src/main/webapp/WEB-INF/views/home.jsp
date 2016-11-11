@@ -16,6 +16,8 @@
 <c:url value="/static/json/envCorrelation.json" var="staticEnvironments"/>
 <c:url value="/static/json/testTypes.json" var="staticTestTypes"/>
 
+<%--<!DOCTYPE html>--%>
+<%-- HTML5 no caching code manifest="/manifest.applicationCache"--%>
 <html>
 <head>
     <title>There's no place like home!</title>
@@ -28,14 +30,15 @@
     <script type="text/javascript" src="${staticSTOMP}"></script>
     <script type="text/javascript">appendOptionsFromJSONPath("${staticEnvironments}", "#select_envs");</script>
     <script type="text/javascript">appendOptionsFromJSONPath("${staticTestTypes}", "#select_type");</script>
-    <meta http-equiv="cache-control" content="max-age=0" />
+    <%-- HTML4 no caching code--%>
+<%--    <meta http-equiv="cache-control" content="max-age=0" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
-    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />--%>
 </head>
 <body>
-<div class="container-fluid">
+<div class="container-fluid" id="site">
     <div class="row" id="header">
         <div class="panel panel-default">
             <div class="panel-body">
@@ -82,7 +85,6 @@
         </div>
     </div>
     <div class="row" id="middle">
-
         <div class="col-lg-4 panel panel-default">
             <div id="nav" class="panel-body">
                 <%--Alert section when something happuns--%>
