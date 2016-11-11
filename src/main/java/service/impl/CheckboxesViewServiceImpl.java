@@ -146,7 +146,7 @@ public class CheckboxesViewServiceImpl implements CheckboxesViewService {
                 .append(htmlCheckboxValueLabel)
                 .append(rootPrefix)
                 .append(htmlCheckboxLabelText)
-                .append(basePackage).append(" ( ").append(finalTests.size()).append(" tests )")
+                .append(basePackage).append("<span class='badge'> ").append(finalTests.size()).append("</span>")
                 .append(htmlCheckboxFin)
                 .append("\n");
 
@@ -180,7 +180,7 @@ public class CheckboxesViewServiceImpl implements CheckboxesViewService {
 
 
                 if (newTests.size() > 0) {
-                    stringBuilder.append(packageName).append(" ( ").append(newTests.size()).append(" tests )")
+                    stringBuilder.append(packageName).append("<span class='badge'> ").append(newTests.size()).append("</span>")
                             .append(htmlCheckboxFin)
                             .append("\n");
                     parsePackages(newTests, parent + "." + packageName);

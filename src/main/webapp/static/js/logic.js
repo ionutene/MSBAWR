@@ -167,21 +167,14 @@ $(document).ready(function () {
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
     $(document).on("change", "input[type='checkbox']", function () {
-        console.log($(this).val() + " has UL siblings: " + $(this).siblings('ul').length);
-/*        $(this).siblings('ul')
+        console.log($(this).val() + " has siblings: " + $(this).siblings().length);
+        console.log($(this).val() + " has children: " + $(this).children().length);
+        console.log($(this).val() + " has parents: " + $(this).parents("li").length);
+        // TODO find if all LI siblings are checked if so, mark the parent and block
+        $(this).siblings('ul')
             .find("input[type='checkbox']")
-            .prop('checked', this.checked);*/
-        // TODO rework eventHandler added because it doesn't follow tree logic
-        if ($(this).siblings('ul').length) {
-            $(this).siblings('ul')
-                .find("input[type='checkbox']")
-                .prop('checked', this.checked);
-        } else {
-            $(this).parents('ul')
-                .find("input[type='checkbox']")
-                .prop('checked', this.checked);
-        }
-
+            .prop('checked', this.checked)
+            .prop("disabled", this.checked);
     });
 
 });
@@ -255,6 +248,7 @@ function getCheckboxes() {
         timeout: 100000,
         success: function (data) {
             $("#checkers").empty();
+            $("#checkers").removeAttr("class");
             $("#checkers").html(data);
             $("#submitTests").removeAttr('disabled');
             $("#cancelTests").removeAttr('disabled');
