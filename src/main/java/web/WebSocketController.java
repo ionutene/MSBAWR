@@ -56,6 +56,7 @@ public class WebSocketController {
         LOGGER.info(searchCriteria);
         runTestsService.setSimpMessagingTemplate(template);
         runTestsService.setSearchCriteria(searchCriteria);
+        runTestsService.parseArguments();
         runTestsService.runTests();
     }
 

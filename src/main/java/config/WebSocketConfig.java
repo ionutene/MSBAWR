@@ -1,5 +1,7 @@
 package config;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.DefaultContentTypeResolver;
@@ -10,19 +12,19 @@ import org.springframework.messaging.handler.invocation.HandlerMethodReturnValue
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.config.annotation.*;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @ComponentScan({"web"})
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport implements WebSocketMessageBrokerConfigurer  {
+
+    private static final Logger LOGGER = LogManager.getLogger(WebSocketConfig.class);
 
     private static final StringMessageConverter MESSAGE_CONVERTER;
+    private static final int MESSAGE_LIMIT = 8 * 1024 * 1024;
 
     static {
         DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
@@ -34,12 +36,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
-        stompEndpointRegistry.addEndpoint("/ws-stomp-stockjs").withSockJS();
+        stompEndpointRegistry.addEndpoint("/ws-stomp-stockjs").withSockJS()
+                .setStreamBytesLimit(MESSAGE_LIMIT).setHttpMessageCacheSize(MESSAGE_LIMIT);
     }
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration webSocketTransportRegistration) {
-
+        webSocketTransportRegistration.setMessageSizeLimit(MESSAGE_LIMIT)
+                .setSendBufferSizeLimit(MESSAGE_LIMIT);
+        super.configureWebSocketTransport(webSocketTransportRegistration);
+        LOGGER.info("WebSocket configured with: " + MESSAGE_LIMIT);
     }
 
     @Override

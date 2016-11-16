@@ -17,7 +17,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RunTestsServiceImpl implements RunTestsService {
@@ -77,13 +80,50 @@ public class RunTestsServiceImpl implements RunTestsService {
         finishTestsAndCleanUp();
     }
 
-//  TODO start implementing way to call tests from test framework
-    private void parseArguments() {
+    public void parseArguments() {
+        boolean isReallyUnique = true;
+        Set<String> uniqueTests = new HashSet<>();
+        Set<String> notSoUniqueTests = new HashSet<>();
         StringBuilder stringBuilder = new StringBuilder();
-        for (String value : searchCriteria.getCheckBoxes()) {
-            stringBuilder.append(value).append(" ");
+        StringBuilder stringBuilderPreTag = new StringBuilder();
+
+        for (String test : searchCriteria.getCheckBoxes()) {
+            for (String otherTest : searchCriteria.getCheckBoxes()) {
+                if (!test.equals(otherTest) && otherTest.contains(test + ".")) {
+                    notSoUniqueTests.add(otherTest);
+                    for (String innerUniqueness : uniqueTests) {
+                        if (test.contains(innerUniqueness)) {
+                            isReallyUnique = false;
+                        }
+                    }
+                    if (isReallyUnique) {
+                        uniqueTests.add(test);
+/*                        LOGGER.info("Found test package <" + test + ">");
+                        messagingTemplate.convertAndSend(stompDestination, "Found test package &lt;" + test + "&gt;\n");*/
+                    }
+                    isReallyUnique = true;
+                }
+            }
         }
-        this.processedArguments = stringBuilder.toString();
+
+        List<String> finalTests = searchCriteria.getCheckBoxes().stream().filter(test -> !notSoUniqueTests.contains(test)).collect(Collectors.toList());
+        /*                LOGGER.info("Test was put in final list [" + test + "]");
+                        messagingTemplate.convertAndSend(stompDestination, "Test was put in final list [" + test + "]\n");*/
+
+        for (String test : finalTests) {
+            if (uniqueTests.contains(test)) {
+                stringBuilder.append("<").append(test).append("> ");
+                stringBuilderPreTag.append("&lt;").append(test).append("&gt; ");
+            } else {
+                stringBuilder.append(test).append(" ");
+                stringBuilderPreTag.append(test).append(" ");
+            }
+        }
+        String argsToExecute = stringBuilder.toString();
+//      TODO implement HTML special character escape to avoid 2 x StringBuilders
+        LOGGER.info("args[]: " + argsToExecute);
+        messagingTemplate.convertAndSend(stompDestination, "args[]: " + stringBuilderPreTag.toString() + "\n");
+        this.processedArguments = argsToExecute;
     }
 
     private void finishTestsAndCleanUp() throws IOException, TransformerException, SAXException, ParserConfigurationException {

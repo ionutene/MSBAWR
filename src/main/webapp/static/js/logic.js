@@ -167,9 +167,9 @@ $(document).ready(function () {
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
     $(document).on("change", "input[type='checkbox']", function () {
-        console.log($(this).val() + " has siblings: " + $(this).siblings().length);
-        console.log($(this).val() + " has children: " + $(this).children().length);
-        console.log($(this).val() + " has parents: " + $(this).parents("li").length);
+        console.log($(this).children("li").length);
+        var parent = $(this).closest("ul");
+        console.log("Parent name is: " + parent.val() + " and has: " + $(parent).children().length + " children!");
         // TODO find if all LI siblings are checked if so, mark the parent and block
         $(this).siblings('ul')
             .find("input[type='checkbox']")
