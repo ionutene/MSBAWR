@@ -18,16 +18,17 @@ $(document).ready(function () {
         serviceLocation = '/ws-stomp-stockjs',
         stompClient = null;
 
+    var user = $('#select_envs').find('option:selected').html();
     var stompHeader = {
-        login: 'mylogin',
-        passcode: 'mypasscode',
+        login: "buk30_8600",
+        passcode: 'mypasscode'
         // additional header
-        'client-id': 'my-client-id'
+        // 'client-id': 'my-client-id'
     };
 
     webSocket = new SockJS(serviceLocation);
     stompClient = Stomp.over(webSocket);
-    stompClient.connect({}, stompConnectCallback, stompErrorCallback);
+    stompClient.connect(stompHeader, stompConnectCallback, stompErrorCallback);
 
 //  Start with the last Select disabled and an action message at the bottom of the Selects
     $('#select_filter').empty();
@@ -89,7 +90,28 @@ $(document).ready(function () {
         $("#section").empty();
         $("<pre>").attr("id", "preSection").appendTo("#section");
         // var headers = {'content-type': 'application/json'};
-        stompClient.send('/app/runTests', {}, JSON.stringify(collectValuesFromCheckboxes()));
+        var argsSelected = JSON.stringify(collectValuesFromCheckboxes());
+        if (argsSelected.length > 8192) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/runTestsFallback",
+                data: argsSelected,
+                dataType: 'text',
+                timeout: 100000,
+                success: function (data) {
+                },
+                error: function (e) {
+                    console.log("ERROR: ", e);
+                },
+                done: function (e) {
+                    //console.log("DONE");
+                }
+            });
+        } else {
+            stompClient.send('/app/runTests', {}, argsSelected);
+        }
+
     });
 
 //  If STOP is clicked, stop running tests

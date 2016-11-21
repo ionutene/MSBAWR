@@ -14,6 +14,7 @@ import util.SshUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class ReindexTestsServiceImpl implements ReindexTestsService {
@@ -36,6 +37,12 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
 
     @Value("${regressionFrameworkLocation}")
     private String regressionFrameworkLocation;
+
+    @Value("${webTestsFileName}")
+    private String webTestsFileName;
+
+    @Value("${webRegressionFrameworkLocation}")
+    private String webRegressionFrameworkLocation;
 
     @Value("${os.cmd.path}")
     private String osCMDPath;
@@ -105,8 +112,8 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
             SshUtil.CopySftpFileToFile(latestBuildPath, jenkinsSession, regressionFrameworkLocation + buildFileName);
 
             // execute generation of tests.xml
-            LOGGER.info("Execute generation of tests.xml");
-            payload.convertAndSend(destination, "Execute generation of tests.xml\n");
+            LOGGER.info("Execute generation of " + webTestsFileName);
+            payload.convertAndSend(destination, "Execute generation of " + webTestsFileName + "\n");
 
             String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + buildFileName + " webtests";
             LOGGER.info(commandToExecute);
@@ -114,6 +121,11 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
 
             Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
             RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), destination, payload);
+
+            while (p.isAlive()) { /* do nothing */}
+
+            FilesAndDirectoryUtil.moveDirectory(Paths.get(regressionFrameworkLocation, webTestsFileName),
+                    Paths.get(webRegressionFrameworkLocation, "/static/json/", webTestsFileName));
 
         } finally {
             jenkinsSession.disconnect();

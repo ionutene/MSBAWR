@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.xml.sax.SAXException;
 import service.PrepareForTestsService;
 import service.ReindexTestsService;
@@ -46,6 +48,16 @@ public class WebSocketController {
     @MessageMapping("/reindex")
     public void reindex(String message) throws Exception {
         reindexTestsService.getLatestRegressionFrameworkJar(stompDestination, template);
+    }
+
+    @RequestMapping(value = "/runTestsFallback")
+    public void runTestsFallback(@RequestBody SearchCriteria searchCriteria)
+            throws ParserConfigurationException, TransformerException, SAXException, IOException {
+        LOGGER.info(searchCriteria);
+        runTestsService.setSimpMessagingTemplate(template);
+        runTestsService.setSearchCriteria(searchCriteria);
+        runTestsService.parseArguments();
+        runTestsService.runTests();
     }
 
     @MessageMapping("/runTests")
