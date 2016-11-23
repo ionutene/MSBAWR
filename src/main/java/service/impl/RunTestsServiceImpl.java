@@ -71,7 +71,7 @@ public class RunTestsServiceImpl implements RunTestsService {
         if (paths.size() != 1) throw new IOException("Too many .jar files!");
 
 //      TODO remove CTA test hardcoding
-        String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + searchCriteria.getEnvironment() + " cta";
+        String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + searchCriteria.getEnvironment() + " " + processedArguments;
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messagingTemplate);
@@ -112,7 +112,7 @@ public class RunTestsServiceImpl implements RunTestsService {
 
         for (String test : finalTests) {
             if (uniqueTests.contains(test)) {
-                stringBuilder.append("<").append(test).append("> ");
+                stringBuilder.append("[").append(test).append("] ");
                 stringBuilderPreTag.append("&lt;").append(test).append("&gt; ");
             } else {
                 stringBuilder.append(test).append(" ");
