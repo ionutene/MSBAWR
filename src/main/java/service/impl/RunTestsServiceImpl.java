@@ -1,5 +1,6 @@
 package service.impl;
 
+import config.WebSocketConfig;
 import data.SearchCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +53,6 @@ public class RunTestsServiceImpl implements RunTestsService {
 
     private SimpMessagingTemplate messagingTemplate;
     private SearchCriteria searchCriteria;
-    @Value("${stompDestination}")
     private String stompDestination;
 
     public void setSimpMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
@@ -61,6 +61,10 @@ public class RunTestsServiceImpl implements RunTestsService {
 
     public void setSearchCriteria(SearchCriteria searchCriteria) {
         this.searchCriteria = searchCriteria;
+    }
+
+    public void setStompDestination() {
+        stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + searchCriteria.getEnvironment();
     }
 
     public void runTests()

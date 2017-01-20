@@ -26,6 +26,9 @@ public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport 
     private static final StringMessageConverter MESSAGE_CONVERTER;
     private static final int MESSAGE_LIMIT = 8 * 1024 * 1024;
 
+    public static final String BROKER_QUEUE_NAME_PREFIX = "/topic/";
+    public static final String APPLICATION_QUEUE_NAME_PREFIX = "/app";
+
     static {
         DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
         resolver.setDefaultMimeType(MimeTypeUtils.TEXT_PLAIN);
@@ -76,7 +79,7 @@ public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport 
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry messageBrokerRegistry) {
-        messageBrokerRegistry.enableSimpleBroker("/topic/");
-        messageBrokerRegistry.setApplicationDestinationPrefixes("/app");
+        messageBrokerRegistry.enableSimpleBroker(BROKER_QUEUE_NAME_PREFIX);
+        messageBrokerRegistry.setApplicationDestinationPrefixes(APPLICATION_QUEUE_NAME_PREFIX);
     }
 }

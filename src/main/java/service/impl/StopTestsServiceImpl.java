@@ -1,5 +1,6 @@
 package service.impl;
 
+import config.WebSocketConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,12 +22,12 @@ public class StopTestsServiceImpl implements StopTestsService {
     @Value("${os.cmd.option}")
     private String osCMDOption;
 
-    @Value("${stompDestination}")
     private String stompDestination;
 
     public void stopRunningTestsOnEnvironment(String environment, SimpMessagingTemplate messagingTemplate) throws IOException {
         String commandToExecute = "for /f \"tokens=1\" %i in ('jps -m ^| find \"" + environment + "\"') do ( taskkill /F /PID %i )";
         LOGGER.info(commandToExecute);
+        stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + environment;
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messagingTemplate);
     }

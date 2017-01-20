@@ -1,5 +1,6 @@
 package service.impl;
 
+import config.WebSocketConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,6 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
     @Value("${regressionFrameworkLocation}")
     private String regressionFrameworkLocation;
 
-    @Value("${stompDestination}")
     private String stompDestination;
 
     private SimpMessagingTemplate messageTemplate;
@@ -52,6 +52,7 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
 
         String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + environment + " version";
         LOGGER.info(commandToExecute);
+        stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + environment;
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messageTemplate);
     }

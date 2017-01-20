@@ -11,6 +11,7 @@ import java.io.IOException;
 public interface RunTestsService {
     void setSimpMessagingTemplate(SimpMessagingTemplate messagingTemplate);
     void setSearchCriteria(SearchCriteria searchCriteria);
+    void setStompDestination();
     void parseArguments();
     void runTests()
             throws IOException, ParserConfigurationException, SAXException, TransformerException;

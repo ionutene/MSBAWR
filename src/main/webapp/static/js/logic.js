@@ -1,36 +1,7 @@
 $(document).ready(function () {
 
-//  Initialise and start WebSocket Connection
-    var stompConnectCallback = function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/message', function (calResult) {
-                // Receives a message.
-                // console.log(calResult.body);
-                $("#preSection").append(calResult.body);
-            });
-        },
-
-        stompErrorCallback = function (error) {
-            console.log("ERROR_STOMP: ", error);
-        };
-
-    var webSocket,
-        serviceLocation = '/ws-stomp-stockjs',
-        stompClient = null;
-
-    var user = $('#select_envs').find('option:selected').html();
-    var stompHeader = {
-        login: "buk30_8600",
-        passcode: 'mypasscode'
-        // additional header
-        // 'client-id': 'my-client-id'
-    };
-
-    webSocket = new SockJS(serviceLocation);
-    stompClient = Stomp.over(webSocket);
-    stompClient.connect(stompHeader, stompConnectCallback, stompErrorCallback);
-
 //  Start with the last Select disabled and an action message at the bottom of the Selects
+    $("#select_type").prop("disabled", true);
     $('#select_filter').empty();
     $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
     $('#select_filter').prop("disabled", true);
@@ -39,6 +10,8 @@ $(document).ready(function () {
     $("#checkers").empty();
     $("<p>").text("No tests selected, use the drop-down and select one!").appendTo("#checkers");
     $("#checkers").show();
+//  Init STOMP messaging over WS connection
+    connectToWS();
 
 //  PrepareTests for already selected buk30_8600 machines
     /*    $("#section").empty();
@@ -81,7 +54,7 @@ $(document).ready(function () {
         e.preventDefault();
         $("#section").empty();
         $("<pre>").attr("id", "preSection").appendTo("#section");
-        stompClient.send('/app/reindex', {}, "reindex");
+        stompClient.send('/app/reindex', {}, JSON.stringify(gatherOptions()));
     });
 
 //  If Start is clicked, preapare and start tests
@@ -127,6 +100,7 @@ $(document).ready(function () {
 
 //  RESET if someone changes the Environment
     $("#select_envs").change(function () {
+
         $("#select_type").prop('selectedIndex', 0);
         $('#select_filter').empty();
         $("<option>").attr("value", "NONE").text("None").appendTo("#select_filter");
@@ -141,7 +115,20 @@ $(document).ready(function () {
 
         $("#section").empty();
         $("<pre>").attr("id", "preSection").appendTo("#section");
-        stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));
+
+        if (currentSubscription != null) {
+            currentSubscription.unsubscribe();
+            currentSubscription = null;
+        }
+
+        var env = $('#select_envs').find('option:selected').html();
+        if (env == "None") {
+            $("#select_type").prop("disabled", true);
+        } else {
+            $("#select_type").prop("disabled", false);
+            currentSubscription = subscribeToNewServer(getQueueName());
+            stompClient.send('/app/prepareForTests', {}, JSON.stringify(gatherOptions()));
+        }
     });
 
 //  If someone changes the Type of test some action must be taken
@@ -189,9 +176,9 @@ $(document).ready(function () {
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
     $(document).on("change", "input[type='checkbox']", function () {
-        console.log($(this).children("li").length);
+        // console.log($(this).children("li").length);
         var parent = $(this).closest("ul");
-        console.log("Parent name is: " + parent.val() + " and has: " + $(parent).children().length + " children!");
+        // console.log("Parent name is: " + parent.val() + " and has: " + $(parent).children().length + " children!");
         // TODO find if all LI siblings are checked if so, mark the parent and block
         $(this).siblings('ul')
             .find("input[type='checkbox']")
@@ -293,6 +280,13 @@ function gatherOptions() {
     return options;
 }
 
+function getQueueName() {
+    var prefixName = "/topic/";
+    var queueName = $('#select_envs').find('option:selected').html();
+    var together = prefixName + queueName;
+    return together.toString();
+}
+
 function collectValuesFromCheckboxes() {
     var favorite = [];
     $.each($("input[type='checkbox']:checked"), function () {
@@ -351,6 +345,41 @@ function printResults(xml) {
 
     $("#resultsTable").show();
 }
+
+var webSocket,
+    serviceLocation = '/ws-stomp-stockjs',
+    stompClient = null,
+    currentSubscription = null;
+
+function connectToWS() {
+    webSocket = new SockJS(serviceLocation);
+    stompClient = Stomp.over(webSocket);
+    // '/topic/message'
+    //  Initialise and start WebSocket Connection
+    var stompConnectCallback = function () {
+            stompClient.subscribe("/topic/None", messageCallBack);
+        },
+
+        stompErrorCallback = function (error) {
+            console.log("ERROR_STOMP: ", error);
+        };
+
+    stompClient.connect({}, stompConnectCallback, stompErrorCallback);
+}
+
+function subscribeToNewServer(queueName) {
+    return stompClient.subscribe(queueName, messageCallBack);
+}
+
+function unSubscribeFromOldServer(subscription) {
+    subscription.unsubscribe();
+}
+
+var messageCallBack = function (message) {
+    // Receives a message.
+    // console.log(message.body);
+    $("#preSection").append(message.body);
+};
 
 //  When dealing with dynamically created elements, the normal Event Handlers don't work
 //  http://api.jquery.com/on/ #Direct and delegated events
