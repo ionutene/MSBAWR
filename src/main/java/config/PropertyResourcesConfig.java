@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.web.context.annotation.RequestScope;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class PropertyResourcesConfig {
     }
 
     @Bean
+    @RequestScope
     public WebTestsJSONData getWebTestsJSONData() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
