@@ -124,8 +124,11 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
 
             while (p.isAlive()) { /* do nothing */}
 
-            FilesAndDirectoryUtil.moveDirectory(Paths.get(regressionFrameworkLocation, webTestsFileName),
-                    Paths.get(webRegressionFrameworkLocation, "/static/json/", webTestsFileName));
+            Path webTests = Paths.get(regressionFrameworkLocation, webTestsFileName);
+            Path webTestsLocation = Paths.get(webRegressionFrameworkLocation, "/static/json/", webTestsFileName);
+
+            LOGGER.info("Proceeding to replace file from: " + webTests + " to: " + webTestsLocation);
+            FilesAndDirectoryUtil.moveDirectory(webTests,webTestsLocation);
 
         } finally {
             jenkinsSession.disconnect();
