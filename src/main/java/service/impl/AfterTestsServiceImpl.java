@@ -147,7 +147,7 @@ public class AfterTestsServiceImpl implements AfterTestsService {
     public void deleteTestOutputResults() throws IOException {
         if (Files.exists(testSourcePath)) {
             LOGGER.info("Deleting recent test source directory: " + testSourcePath.toAbsolutePath().toString());
-            FilesAndDirectoryUtil.deleteDirectory(testSourcePath);
+            FilesAndDirectoryUtil.deleteDirectoryContents(testSourcePath);
         }
     }
 }

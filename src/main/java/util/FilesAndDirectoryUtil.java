@@ -36,7 +36,7 @@ public class FilesAndDirectoryUtil {
         return false;
     }
 
-    public static void deleteDirectory(String directoryPath) throws IOException {
+    public static void deleteDirectoryContents(String directoryPath) throws IOException {
         Files.walkFileTree(FileSystems.getDefault().getPath(directoryPath), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -46,13 +46,15 @@ public class FilesAndDirectoryUtil {
 
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
+                if (!FileSystems.getDefault().getPath(directoryPath).equals(dir)) {
+                    Files.delete(dir);
+                }
                 return FileVisitResult.CONTINUE;
             }
         });
     }
 
-    public static void deleteDirectory(Path directoryPath) throws IOException {
+    public static void deleteDirectoryContents(Path directoryPath) throws IOException {
         Files.walkFileTree(directoryPath, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

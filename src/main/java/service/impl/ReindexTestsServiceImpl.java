@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import service.ReindexTestsService;
 import util.FilesAndDirectoryUtil;
 import util.RuntimeProcessesUtil;
 import util.SshUtil;
@@ -17,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
-public class ReindexTestsServiceImpl implements ReindexTestsService {
+public class ReindexTestsServiceImpl {
 
     private static final Logger LOGGER = LogManager.getLogger(ReindexTestsServiceImpl.class);
 
@@ -79,7 +78,7 @@ public class ReindexTestsServiceImpl implements ReindexTestsService {
                 LOGGER.info("Clean-up the folder");
                 payload.convertAndSend(destination, "Clean-up the folder\n");
 
-                FilesAndDirectoryUtil.deleteDirectory(regressionFrameworkLocation);
+                FilesAndDirectoryUtil.deleteDirectoryContents(regressionFrameworkLocation);
                 FilesAndDirectoryUtil.createDirectory(regressionFrameworkLocation);
 
                 // copy the new .zip file

@@ -122,20 +122,23 @@ public class CheckboxesViewServiceImpl implements CheckboxesViewService {
 //      Type = ALL && Filter = ALL
         if (selectedOptions.getType().equals(allValue) && selectedOptions.getFilter().equals(allValue)) {
             basePackage = allKey;
-            rootPrefix = prefixAll + ".tests";
             parentName = "tests";
+            rootPrefix = prefixAll + "." + parentName;
         }
 
+//      Type != ALL && Filter = ALL
         if (!selectedOptions.getType().equals(allValue) && selectedOptions.getFilter().equals(allValue)) {
             basePackage = selectedOptions.getType();
-            rootPrefix = prefix.substring(0, (prefix.length() - 1));
             parentName = selectedOptions.getType().toLowerCase();
+//            .substring(0, (prefix.length() - 1))
+            rootPrefix = prefix + parentName;
         }
 
+//      Type != ALL && Filter != ALL
         if (!selectedOptions.getType().equals(allValue) && !selectedOptions.getFilter().equals(allValue)) {
             basePackage = selectedOptions.getFilter();
-            rootPrefix = prefix + selectedOptions.getType().toLowerCase();
             parentName = selectedOptions.getFilter();
+            rootPrefix = prefix + selectedOptions.getType().toLowerCase() + "." + parentName;
         }
 
         stringBuilder.append("<li>")
@@ -151,11 +154,11 @@ public class CheckboxesViewServiceImpl implements CheckboxesViewService {
                 .append("\n");
 
 //      Type = ALL && Filter = ALL
-        if (selectedOptions.getType().equals(allValue) && selectedOptions.getFilter().equals(allValue)) {
+/*        if (selectedOptions.getType().equals(allValue) && selectedOptions.getFilter().equals(allValue)) {
             rootPrefix = prefixAll;
-        }
-
-        parsePackages(finalTests, rootPrefix + "." + parentName);
+        }*/
+//+ "." + parentName
+        parsePackages(finalTests, rootPrefix);
 
 //      Close the top most Unordered List
         stringBuilder.append("</ul>").append("\n");

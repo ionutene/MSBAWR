@@ -139,7 +139,7 @@ public class SshUtil {
         return stringBuilder.toString();
     }
 */
-    public static boolean CopySftpFileToFile(String sourceFile, Session sourceFileSession, String targetFile) throws Exception {
+    public static boolean CopySftpFileToFile(String sourceFile, Session sourceFileSession, String targetFile) throws JSchException, SftpException, IOException {
 
         ChannelSftp channelSourceSftp = (ChannelSftp) sourceFileSession.openChannel("sftp");
         channelSourceSftp.connect();
@@ -178,6 +178,23 @@ public class SshUtil {
             LOGGER.warn("The are NO <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
             return null;
         }
+
+        return filePath;
+    }
+
+    public static String getZipFilePath(String jenkinsAdapterProject, String fileType, Session sshConn) throws JSchException {
+        String command = "find " + jenkinsAdapterProject + " -name *" + fileType;
+        LOGGER.info(command);
+        ChannelExec channelExec = getChannelExec(command, sshConn);
+        String filePath = executeCommand(channelExec, command, true);
+
+/*        if ((filePath.length() - filePath.replace(fileType, "").length()) > fileType.length()) {
+            LOGGER.warn("The are more <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
+            return null;
+        } else if ((filePath.length() - filePath.replace(fileType, "").length()) < fileType.length()) {
+            LOGGER.warn("The are NO <" + fileType + "> files in path:" + jenkinsAdapterProject + "/builds/" + buildNumber + "/archive/target/");
+            return null;
+        }*/
 
         return filePath;
     }
