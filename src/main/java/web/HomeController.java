@@ -19,10 +19,8 @@ public class HomeController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String home() {
-        LOGGER.info(OPERATING_SYSTEM);
-        LOGGER.info(osCMDPath);
-
         if (!OPERATING_SYSTEM.contains("Windows") && osCMDPath.equals("cmd.exe")) {
+            LOGGER.info("Mismatch between OS and terminal choice!");
             return "error";
         } else {
             return "home";
