@@ -69,7 +69,7 @@ public class PrepareForTestsServiceImpl implements PrepareForTestsService {
         String commandToExecute = osCMDCd + regressionFrameworkLocation + osCMDAndJar + paths.get(0) + " " + environment + " version";
         LOGGER.info(commandToExecute);
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
-        String content = RuntimeProcessesUtil.getMSBAdapterVersionFromInputStream(p.getInputStream());
+        String content = RuntimeProcessesUtil.getStringFromInputStream(p.getInputStream());
 
         if (content.length() > 1) {
             if (content.contains("MAS:") && content.contains("MPOS:")) {

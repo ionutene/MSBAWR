@@ -31,7 +31,7 @@ public class RuntimeProcessesUtil {
         }
     }
 
-    public static String getMSBAdapterVersionFromInputStream(InputStream stream) throws IOException {
+    public static String getStringFromInputStream(InputStream stream) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader r = new BufferedReader(new InputStreamReader(stream))) {
             String line;

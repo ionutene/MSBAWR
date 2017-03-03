@@ -13,10 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.xml.sax.SAXException;
-import service.PrepareForTestsService;
-import service.ReindexTestsService;
-import service.RunTestsService;
-import service.StopTestsService;
+import service.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -40,6 +37,9 @@ public class WebSocketController {
     private PrepareForTestsService prepareForTestsService;
 
     @Autowired
+    private ProcessVerificationService processVerificationService;
+
+    @Autowired
     private SimpMessagingTemplate template;
 
 //  TODO CHECK IF TESTS ARE RUNNING AND IF SO, DON'T TRY TO REINDEX!!!!!
@@ -49,7 +49,12 @@ public class WebSocketController {
         AdvancedSearchCriteria advancedSearchCriteria = objectMapper.readValue(message, AdvancedSearchCriteria.class);
         LOGGER.info(advancedSearchCriteria);
         String stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + advancedSearchCriteria.getEnv();
-        reindexTestsService.getLatestRegressionFrameworkJar(stompDestination, template);
+        if (processVerificationService.verifyRunningProcesses(advancedSearchCriteria.getEnv(), template)) {
+            template.convertAndSend(stompDestination, "Some java processes are still running please stop them manually or wait for them to finish!");
+            LOGGER.info("Some java processes are still running please stop them manually or wait for them to finish!");
+        } else {
+            reindexTestsService.getLatestRegressionFrameworkJar(stompDestination, template);
+        }
     }
 
     @RequestMapping(value = "/runTestsFallback")
