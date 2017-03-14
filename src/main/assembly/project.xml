@@ -9,13 +9,15 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>${project.basedir}/target/msbarwr-1.0-SNAPSHOT</directory>
             <outputDirectory>/</outputDirectory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-                <exclude>**/*.log</exclude>
-                <exclude>**/${project.build.directory}/**</exclude>
-            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>*.war</include>
+            </includes>
         </fileSet>
     </fileSets>
 </assembly>
