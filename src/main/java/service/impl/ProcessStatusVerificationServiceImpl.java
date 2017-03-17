@@ -5,11 +5,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 import service.ProcessVerificationService;
 import util.RuntimeProcessesUtil;
 
 import java.io.IOException;
 
+@Service
 public class ProcessStatusVerificationServiceImpl implements ProcessVerificationService {
 
     private static final Logger LOGGER = LogManager.getLogger(ProcessStatusVerificationServiceImpl.class);
