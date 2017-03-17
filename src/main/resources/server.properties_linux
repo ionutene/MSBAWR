@@ -1,0 +1,20 @@
+# MSBAdapter-RegressionWeb.war	location
+webRegressionFrameworkLocation=/usr/tomcat/apache-tomcat-8.5.11/webapps/ROOT/
+webRegressionFrameworkResultsLocation=/usr/tomcat/results/
+webRegressionFrameworkResultsFileName=results.xml
+stompDestination=/topic/message
+
+# RegressionTestMSBAdapter-1.0.65-SNAPSHOT-jar-with-dependencies location
+regressionFrameworkLocation=/home/mai/test_msba/
+regressionFrameworkTestOutputDirectoryName=test-output
+regressionFrameworkLogFileName=RegressionTestMSBAdapter
+regressionFrameworkLogSeparator=_
+regressionFrameworkLogFormatType=.log
+regressionFrameworkIndexFile=index.html
+
+# Depending on Server OS put the cmd/bash path and option
+os.cmd.path=/bin/sh
+os.cmd.option=-c
+os.cmd.cd=cd\u0020
+os.cmd.andJar= && java -jar\u0020
+os.cmd.anyJar=*.{jar}
