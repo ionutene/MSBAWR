@@ -42,7 +42,6 @@ public class WebSocketController {
     @Autowired
     private SimpMessagingTemplate template;
 
-//  TODO CHECK IF TESTS ARE RUNNING AND IF SO, DON'T TRY TO REINDEX!!!!!
     @MessageMapping("/reindex")
     public void reindex(String message) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -96,8 +95,10 @@ public class WebSocketController {
         LOGGER.info(advancedSearchCriteria);
         prepareForTestsService.setEnvironment(advancedSearchCriteria.getEnv());
         prepareForTestsService.setSimpMessageTemplate(template);
-        prepareForTestsService.getMachinesVersion();
-        prepareForTestsService.zipResults();
+        if (!processVerificationService.verifyRunningProcesses(advancedSearchCriteria.getEnv(), template)) {
+            prepareForTestsService.getMachinesVersion();
+            prepareForTestsService.zipResults();
+        }
     }
 
 }

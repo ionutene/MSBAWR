@@ -32,25 +32,25 @@ public class ProcessStatusVerificationServiceImpl implements ProcessVerification
     public boolean verifyRunningProcesses(String environment, SimpMessagingTemplate messagingTemplate) throws IOException {
         stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + environment;
         String commandToExecute;
-        if (OPERATING_SYSTEM.contains("Windows")) {
+        if (OPERATING_SYSTEM.toLowerCase().contains("windows")) {
             commandToExecute = "jps -m | find \"" + regressionFrameworkLogFileName + "\"";
         } else {
             commandToExecute = "jps -m | grep -i \"" + regressionFrameworkLogFileName + "\"";
         }
         LOGGER.info(commandToExecute);
-        messagingTemplate.convertAndSend(stompDestination, commandToExecute);
+//        messagingTemplate.convertAndSend(stompDestination, commandToExecute + "\n");
 
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         String processes = RuntimeProcessesUtil.getStringFromInputStream(p.getInputStream());
 
         if (processes.trim().isEmpty()) {
             LOGGER.info("Haven't found any java processes running!");
-            messagingTemplate.convertAndSend(stompDestination, "Haven't found any java processes running!");
+//            messagingTemplate.convertAndSend(stompDestination, "Haven't found any java processes running!\n");
         } else {
             LOGGER.info("Found the following processes: ");
             LOGGER.info(processes);
-            messagingTemplate.convertAndSend(stompDestination, "Found the following processes: ");
-            messagingTemplate.convertAndSend(stompDestination, processes);
+/*            messagingTemplate.convertAndSend(stompDestination, "Found the following processes: \n");
+            messagingTemplate.convertAndSend(stompDestination, processes);*/
         }
 
         return !processes.trim().isEmpty();
