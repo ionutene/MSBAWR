@@ -28,6 +28,7 @@ public class StopTestsServiceImpl implements StopTestsService {
 
     public void stopRunningTestsOnEnvironment(String environment, SimpMessagingTemplate messagingTemplate) throws IOException {
         String commandToExecute;
+        stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + environment;
         if (OPERATING_SYSTEM.contains("Windows")) {
             commandToExecute = "for /f \"tokens=1\" %i in ('jps -m ^| find \"" + environment + "\"') do ( taskkill /F /PID %i )";
         } else {
@@ -35,7 +36,6 @@ public class StopTestsServiceImpl implements StopTestsService {
         }
         LOGGER.info(commandToExecute);
         messagingTemplate.convertAndSend(stompDestination, commandToExecute);
-        stompDestination = WebSocketConfig.BROKER_QUEUE_NAME_PREFIX + environment;
         Process p = RuntimeProcessesUtil.getProcessFromBuilder(osCMDPath, osCMDOption, commandToExecute);
         RuntimeProcessesUtil.printCMDToWriter(p.getInputStream(), stompDestination, messagingTemplate);
     }
